@@ -61,6 +61,7 @@ kontrol-admin/
 │       │   ├── validate.js # Validasi form berbasis atribut HTML
 │       │   ├── errors-data.js # Data & renderer halaman error 4xx/5xx
 │       │   ├── data.js     # Data seed demo
+│       │   ├── data-v3.js  # Seed Kanban, Calendar, Inbox, Invoices, Import
 │       │   ├── store.js    # Repository in-memory + localStorage
 │       │   ├── ui.js       # Icon, toast, modal, confirm, form builder, menu
 │       │   ├── table.js    # DataTable: cari, filter, sort, paginasi, bulk, CSV
@@ -76,6 +77,7 @@ kontrol-admin/
 │       │   ├── preferences.js    # Settings, Appearance, Localization, Security
 │       │   ├── support.js        # Help Center, Documentation, Feedback
 │       │   ├── account.js        # Profile, Account Settings, Upgrade Plan
+│       │   ├── kanban.js / calendar.js / inbox.js / import.js / invoices.js  # Tools (v3)
 │       │   ├── forms.js          # UI Kit: Forms & Wizard, Auth Pages
 │       │   ├── uikit.js          # UI Kit: Toasts, Icons, Charts, Tables, Errors
 │       │   └── errors.js         # 404, 403, #/error/:kode
@@ -117,6 +119,18 @@ kontrol-admin/
 | | Documentation | Referensi API, scrollspy, salin kode, unduh OpenAPI |
 | | Feedback | Formulir + rating, papan voting |
 | Akun | Profile / Account / Upgrade Plan | Profil, ganti email/sandi + meter kekuatan, setup 2FA + kode cadangan, paket & invoice |
+
+## Baru di v3 — grup **Tools**
+
+| Modul | Fitur | Endpoint backend yang disarankan |
+|---|---|---|
+| **Kanban Board** `#/kanban` | 5 kolom, drag & drop (HTML5), `Alt + ←/→` untuk keyboard, batas WIP, label, prioritas, filter orang/label | `PATCH /tasks/:id { status, order }` |
+| **Calendar** `#/calendar` | Tampilan bulan & agenda, mini calendar, filter kategori, klik tanggal untuk buat acara, minggu mulai Senin | `GET /events?from=&to=` · `POST/PATCH/DELETE /events/:id` |
+| **Inbox** `#/inbox` | Omnichannel WhatsApp/Email/Internal, thread chat, quick reply, lampiran, indikator mengetik, alihkan percakapan, catatan internal, mode mobile | `GET /conversations` · `POST /conversations/:id/messages` + WebSocket/SSE |
+| **Import Center** `#/import` | Upload CSV (deteksi `,`/`;`), auto-mapping kolom, validasi per baris (format, duplikat, data sudah ada), unduh baris error, riwayat impor | `POST /imports` → job antrean |
+| **Invoices** `#/invoices` | Pola CRUD lengkap, item dinamis, diskon + PPN 11%, draf/terbit, catat pembayaran, **cetak/PDF A4** (`@media print`) | `GET/POST/PATCH /invoices` — **hitung total ulang di server** |
+
+> Data lama di `localStorage` tetap aman: koleksi baru otomatis ditambahkan saat versi template naik.
 
 ## Baru di v2
 

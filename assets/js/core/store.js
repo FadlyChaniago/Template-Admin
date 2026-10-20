@@ -20,7 +20,12 @@
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) { db = JSON.parse(raw); return; }
+      if (raw) {
+        db = JSON.parse(raw);
+        // Koleksi baru dari versi template berikutnya ditambahkan tanpa menghapus data lama
+        Object.keys(K.seed).forEach(k => { if (!(k in db)) db[k] = clone(K.seed[k]); });
+        return;
+      }
     } catch { /* storage diblokir atau korup → pakai seed */ }
     db = clone(K.seed);
   }

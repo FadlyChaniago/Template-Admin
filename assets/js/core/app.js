@@ -58,6 +58,13 @@
       { id: 'docs', label: 'Documentation', icon: 'book-open', perm: 'dashboard.view' },
       { id: 'feedback', label: 'Feedback', icon: 'message-square', perm: 'dashboard.view' },
     ] },
+    { group: 'Tools', items: [
+      { id: 'kanban', label: 'Kanban Board', icon: 'square-kanban', perm: 'dashboard.view' },
+      { id: 'calendar', label: 'Calendar', icon: 'calendar-days', perm: 'dashboard.view' },
+      { id: 'inbox', label: 'Inbox', icon: 'inbox', perm: 'dashboard.view', badge: () => K.store.all('conversations').reduce((s, c) => s + (c.unread || 0), 0), badgeTone: 'primary' },
+      { id: 'import', label: 'Import Center', icon: 'file-up', perm: 'users.create' },
+      { id: 'invoices', label: 'Invoices', icon: 'receipt-text', perm: 'billing.view' },
+    ] },
     { group: 'UI Kit', items: [
       { id: 'ui-forms', label: 'Forms & Wizard', icon: 'square-pen', perm: 'dashboard.view' },
       { id: 'ui-toasts', label: 'Toasts & Alerts', icon: 'bell-ring', perm: 'dashboard.view' },
@@ -154,7 +161,7 @@
     }).join('');
     markActive();
   }
-  const groupIcon = { Workspace: 'chart-column', Management: 'users', Content: 'file-text', Applications: 'app-window', System: 'server', Preferences: 'settings', Support: 'life-buoy', 'UI Kit': 'shapes' };
+  const groupIcon = { Tools: 'square-kanban', Workspace: 'chart-column', Management: 'users', Content: 'file-text', Applications: 'app-window', System: 'server', Preferences: 'settings', Support: 'life-buoy', 'UI Kit': 'shapes' };
 
   K.layout = {
     get() { return LS.get('kontrol:layout', 'sidebar'); },
@@ -408,7 +415,7 @@
 
     // Sinkronkan badge & notifikasi saat data berubah
     K.store.on('change', ({ collection }) => {
-      if (['notifications', 'tasks', '*'].includes(collection)) { renderSidebar(); renderTopnav(); renderNotifMenu(); }
+      if (['notifications', 'tasks', 'conversations', '*'].includes(collection)) { renderSidebar(); renderTopnav(); renderNotifMenu(); }
       if (collection === 'roles' || collection === 'users' || collection === '*') { renderSidebar(); renderTopnav(); }
     });
 
