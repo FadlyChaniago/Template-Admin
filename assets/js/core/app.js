@@ -58,12 +58,23 @@
       { id: 'docs', label: 'Documentation', icon: 'book-open', perm: 'dashboard.view' },
       { id: 'feedback', label: 'Feedback', icon: 'message-square', perm: 'dashboard.view' },
     ] },
+    { group: 'UI Kit', items: [
+      { id: 'ui-forms', label: 'Forms & Wizard', icon: 'square-pen', perm: 'dashboard.view' },
+      { id: 'ui-toasts', label: 'Toasts & Alerts', icon: 'bell-ring', perm: 'dashboard.view' },
+
+      { id: 'ui-icons', label: 'Icons', icon: 'shapes', perm: 'dashboard.view' },
+      { id: 'ui-charts', label: 'Charts', icon: 'chart-pie', perm: 'dashboard.view' },
+      { id: 'ui-tables', label: 'Tables & Pagination', icon: 'table', perm: 'dashboard.view' },
+      { id: 'ui-errors', label: 'Error Pages', icon: 'octagon-x', perm: 'dashboard.view' },
+      { id: 'ui-auth', label: 'Auth Pages', icon: 'key-round', perm: 'dashboard.view' },
+    ] },
   ];
   /** Route tambahan di luar sidebar (menu akun). */
   const extraRoutes = [
     { id: 'profile', label: 'User Profile', icon: 'circle-user', group: 'Akun' },
     { id: 'account', label: 'Account Settings', icon: 'user-cog', group: 'Akun' },
     { id: 'billing', label: 'Upgrade Plan', icon: 'sparkles', group: 'Akun' },
+    { id: 'error', label: 'Pratinjau error', icon: 'octagon-x', group: 'UI Kit' },
   ];
   const navIndex = new Map();
   K.nav.forEach(g => g.items.forEach(it => navIndex.set(it.id, { ...it, group: g.group })));
@@ -124,11 +135,40 @@
     markActive();
   }
 
+  /* ---------- Navigasi atas (layout "topnav") ----------
+     Data sama dengan sidebar (K.nav); tiap grup menjadi dropdown. */
+  function renderTopnav() {
+    const el = $('#topnav-list'); if (!el) return;
+    el.innerHTML = K.nav.map(g => {
+      const items = g.items.filter(it => !it.perm || K.can(it.perm));
+      if (!items.length) return '';
+      if (items.length === 1) {
+        const it = items[0];
+        return `<li><a href="#/${it.id}" class="topnav__link" data-nav="${it.id}">${icon(it.icon)}<span>${esc(it.label)}</span></a></li>`;
+      }
+      return `<li class="menu-anchor"><button type="button" class="topnav__link" data-menu-toggle aria-expanded="false" aria-haspopup="true" data-group="${esc(g.group)}">${icon(groupIcon[g.group] || 'folder')}<span>${esc(g.group)}</span>${icon('chevron-down', 'topnav__caret')}</button>
+        <div class="menu menu--left topnav__menu">${items.map(it => {
+          const b = it.badge ? it.badge() : 0;
+          return `<a href="#/${it.id}" class="menu__item" data-nav="${it.id}">${icon(it.icon)}<span class="flex-1">${esc(it.label)}</span>${b ? `<span class="nav-link__badge">${b}</span>` : ''}</a>`;
+        }).join('')}</div></li>`;
+    }).join('');
+    markActive();
+  }
+  const groupIcon = { Workspace: 'chart-column', Management: 'users', Content: 'file-text', Applications: 'app-window', System: 'server', Preferences: 'settings', Support: 'life-buoy', 'UI Kit': 'shapes' };
+
+  K.layout = {
+    get() { return LS.get('kontrol:layout', 'sidebar'); },
+    set(v) { LS.set('kontrol:layout', v); document.documentElement.dataset.layout = v; document.querySelectorAll('.menu.is-open').forEach(m => K.ui.closeMenu(m)); window.dispatchEvent(new Event('resize')); },
+  };
+
   function markActive() {
     const id = router.current?.id;
     document.querySelectorAll('[data-nav]').forEach(a => {
       if (a.dataset.nav === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
     });
+    // Tandai grup di navigasi atas yang memuat halaman aktif
+    const grp = router.current?.meta?.group;
+    document.querySelectorAll('#topnav [data-group]').forEach(b => b.classList.toggle('is-active', b.dataset.group === grp));
   }
 
   function setupSidebar() {
@@ -223,6 +263,7 @@
       { group: 'Aksi cepat', label: 'Kirim feedback', icon: 'message-square-plus', run: () => router.go('feedback') },
       { group: 'Preferensi', label: 'Ganti tema terang/gelap', icon: 'sun-moon', run: () => K.theme.toggle() },
       { group: 'Preferensi', label: 'Ciutkan / buka sidebar', icon: 'panel-left', run: () => $('#sidebar-toggle').click() },
+      { group: 'Preferensi', label: 'Ganti layout: sidebar kiri ↔ navigasi atas', icon: 'layout-panel-top', run: () => K.layout.set(K.layout.get() === 'topnav' ? 'sidebar' : 'topnav') },
     ];
     return [...nav, ...actions];
   }
@@ -315,14 +356,24 @@
     },
   };
   K.router = router;
+  /** Halaman detail boleh mengganti breadcrumb, mis. K.setCrumb('Users', 'Andi Pratama', '#/users'). */
+  K.setCrumb = (parent, current, parentHref) => {
+    const p = $('#crumb-parent');
+    p.innerHTML = parentHref ? `<a href="${parentHref}" style="color:inherit">${esc(parent)}</a>` : esc(parent);
+    $('#crumb-current').textContent = current;
+    document.title = current + ' · Kontrol';
+  };
 
   /* ---------- Boot ---------- */
   function boot() {
     K.theme.apply(false);
     document.documentElement.dataset.density = LS.get('kontrol:density', 'default');
     K.ui.initMenus();
+    document.documentElement.dataset.layout = K.layout.get();
+    $('#toast-region').dataset.pos = LS.get('kontrol:toast-pos', 'bottom-right');
     setupSidebar();
     renderSidebar();
+    renderTopnav();
     renderNotifMenu();
 
     const me = K.currentUser();
@@ -357,8 +408,8 @@
 
     // Sinkronkan badge & notifikasi saat data berubah
     K.store.on('change', ({ collection }) => {
-      if (['notifications', 'tasks', '*'].includes(collection)) { renderSidebar(); renderNotifMenu(); }
-      if (collection === 'roles' || collection === 'users' || collection === '*') renderSidebar();
+      if (['notifications', 'tasks', '*'].includes(collection)) { renderSidebar(); renderTopnav(); renderNotifMenu(); }
+      if (collection === 'roles' || collection === 'users' || collection === '*') { renderSidebar(); renderTopnav(); }
     });
 
     window.addEventListener('hashchange', () => router.render(true));

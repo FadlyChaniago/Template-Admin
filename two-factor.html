@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Verifikasi dua langkah · Kontrol</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('kontrol:theme') || '"system"');
+        var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+  <button type="button" class="icon-btn theme-fab" data-theme-toggle aria-label="Ganti tema"></button>
+  <main class="auth auth--center">
+    <section class="auth__panel"><div style="text-align:center;margin-bottom:24px"><a href="index.html" class="brand" aria-label="Kontrol"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a></div>
+      <div class="auth__card">
+        <form data-auth="otp" data-next="index.html">
+          <div class="auth-icon"><i data-lucide="shield-check"></i></div>
+          <h1 class="auth-title">Verifikasi dua langkah</h1>
+          <p class="text-secondary mt-2">Masukkan 6 digit kode dari aplikasi authenticator Anda.</p>
+          <div class="stack mt-6" style="gap:16px">
+            <div class="alert alert--danger" data-note hidden role="alert"><i data-lucide="circle-alert"></i><div><p class="alert__text"></p></div></div>
+            <fieldset style="border:0;padding:0;margin:0"><legend class="sr-only">Kode verifikasi 6 digit</legend>
+              <div class="otp"><input inputmode="numeric" autocomplete="one-time-code" maxlength="1" aria-label="Digit 1" autofocus><input inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 2"><input inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 3"><input inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 4"><input inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 5"><input inputmode="numeric" autocomplete="off" maxlength="1" aria-label="Digit 6"></div></fieldset>
+            <input type="hidden" name="code">
+            <label class="check"><input type="checkbox" name="trust"> Percayai perangkat ini selama 30 hari</label>
+            <button type="submit" class="btn btn-primary btn-lg btn-block"><i data-lucide="shield-check"></i><span>Verifikasi</span></button>
+            <p class="text-xs text-muted" style="text-align:center">Demo: gunakan kode <span class="mono">123456</span>.</p>
+          </div>
+          <p class="auth-foot">Tidak bisa mengakses authenticator? <a href="#" onclick="this.closest('form').querySelector('[data-backup]').hidden=false;return false">Gunakan kode cadangan</a></p>
+          <div class="field mt-4" data-backup hidden><label class="label" for="backup">Kode cadangan</label><input class="input mono" id="backup" placeholder="xxxx-0000" autocomplete="off"></div>
+        </form>
+      </div>
+      <p class="auth-foot">© 2026 Kontrol · <a href="index.html#/help">Bantuan</a></p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js"></script>
+  <script src="assets/js/core/validate.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

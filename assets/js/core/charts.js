@@ -130,6 +130,9 @@
       });
     },
 
+    /** Konfigurasi Chart.js mentah (radar, polar, scatter, mixed, dll) — tetap terdaftar untuk cleanup. */
+    custom(canvas, config) { return make(canvas, config); },
+
     hasAny() { return registry.size > 0; },
     destroyAll() { registry.forEach(c => c.destroy()); registry.clear(); },
     refreshTheme() { applyDefaults(); },

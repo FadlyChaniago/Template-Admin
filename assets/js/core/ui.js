@@ -136,18 +136,27 @@
     checkedValues(form, name) { return [...form.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value); },
 
     /* ---------- Toast ---------- */
-    toast(title, text = '', type = 'success', timeout = 3800) {
+    /** ui.toast(judul, teks, tipe, timeoutMs, { action: { label, onClick } })
+        tipe: success | error | warning | info. timeout 0 = tidak hilang otomatis. */
+    toast(title, text = '', type = 'success', timeout = 3800, opts = {}) {
       const region = document.getElementById('toast-region');
       if (!region) return;
       const icons = { success: 'circle-check', error: 'circle-alert', warning: 'triangle-alert', info: 'info' };
       const el = document.createElement('div');
       el.className = `toast toast--${type}`;
       el.setAttribute('role', type === 'error' ? 'alert' : 'status');
-      el.innerHTML = `${ui.icon(icons[type] || 'info')}<div class="toast__body"><p class="toast__title">${esc(title)}</p>${text ? `<p class="toast__text">${esc(text)}</p>` : ''}</div>${ui.iconBtn('x', 'Tutup notifikasi', 'data-close')}`;
-      const close = () => { el.classList.add('is-leaving'); setTimeout(() => el.remove(), 180); };
+      el.innerHTML = `${ui.icon(icons[type] || 'info')}<div class="toast__body"><p class="toast__title">${esc(title)}</p>${text ? `<p class="toast__text">${esc(text)}</p>` : ''}${opts.action ? `<button type="button" class="btn btn-secondary btn-sm toast__action" data-act>${esc(opts.action.label)}</button>` : ''}</div>${ui.iconBtn('x', 'Tutup notifikasi', 'data-close')}${timeout ? `<span class="toast__bar" style="animation-duration:${timeout}ms"></span>` : ''}`;
+      let timer;
+      const close = () => { clearTimeout(timer); el.classList.add('is-leaving'); setTimeout(() => el.remove(), 180); };
       el.querySelector('[data-close]').addEventListener('click', close);
+      el.querySelector('[data-act]')?.addEventListener('click', () => { opts.action.onClick && opts.action.onClick(); close(); });
+      // Jeda saat hover agar pengguna sempat membaca
+      el.addEventListener('mouseenter', () => { clearTimeout(timer); el.querySelector('.toast__bar')?.style.setProperty('animation-play-state', 'paused'); });
+      el.addEventListener('mouseleave', () => { if (timeout) { el.querySelector('.toast__bar')?.style.setProperty('animation-play-state', 'running'); timer = setTimeout(close, 1500); } });
       region.appendChild(el);
-      if (timeout) setTimeout(close, timeout);
+      while (region.children.length > 5) region.firstElementChild.remove(); // batasi tumpukan
+      if (timeout) timer = setTimeout(close, timeout);
+      return { close };
     },
 
     /* ---------- Modal (native <dialog>) ----------

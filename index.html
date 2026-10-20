@@ -17,6 +17,7 @@
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
         var d = JSON.parse(localStorage.getItem('kontrol:density') || '"default"');
         document.documentElement.dataset.density = d;
+        document.documentElement.dataset.layout = JSON.parse(localStorage.getItem('kontrol:layout') || '"sidebar"');
       } catch (e) { document.documentElement.dataset.theme = 'light'; }
     })();
   </script>
@@ -73,6 +74,7 @@
     <div class="main-wrap">
       <header class="topbar">
         <div class="topbar__left">
+          <a href="#/dashboard" class="topbar__brand" aria-label="Kontrol — ke Dashboard"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a>
           <button type="button" class="icon-btn" id="drawer-open" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" data-mobile-only data-icon="menu"></button>
           <button type="button" class="icon-btn" id="sidebar-toggle" aria-controls="sidebar" data-desktop-only></button>
           <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -107,12 +109,16 @@
               <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span>User Profile</a>
               <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span>Account Settings</a>
               <a href="#/appearance" class="menu__item" role="menuitem"><span data-icon="palette"></span>Appearance</a>
+              <a href="lock-screen.html" class="menu__item" role="menuitem"><span data-icon="lock"></span>Kunci layar</a>
               <div class="menu__sep"></div>
               <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span>Sign Out</button>
             </div>
           </div>
         </div>
       </header>
+
+      <!-- Navigasi atas: aktif saat Appearance → Tata letak = "Navigasi atas" -->
+      <nav class="topnav" id="topnav" aria-label="Menu utama (atas)"><ul class="topnav__list" id="topnav-list"></ul></nav>
 
       <main class="content" id="main">
         <div class="content-inner" id="view" tabindex="-1" aria-live="polite"></div>
@@ -124,7 +130,7 @@
           <div class="flex items-center gap-3 wrap">
             <span class="flex items-center gap-2"><span style="width:6px;height:6px;border-radius:50%;background:var(--chart-1)"></span>Data ilustratif</span>
             <span class="text-muted">Bahasa Indonesia · IDR</span>
-            <span class="text-muted">v1.0.0</span>
+            <span class="text-muted">v2.0.0</span>
           </div>
         </div>
       </footer>
@@ -139,6 +145,8 @@
 
   <!-- Core -->
   <script src="assets/js/core/utils.js" defer></script>
+  <script src="assets/js/core/errors-data.js" defer></script>
+  <script src="assets/js/core/validate.js" defer></script>
   <script src="assets/js/core/data.js" defer></script>
   <script src="assets/js/core/store.js" defer></script>
   <script src="assets/js/core/ui.js" defer></script>
@@ -156,6 +164,8 @@
   <script src="assets/js/pages/preferences.js" defer></script>
   <script src="assets/js/pages/support.js" defer></script>
   <script src="assets/js/pages/account.js" defer></script>
+  <script src="assets/js/pages/forms.js" defer></script>
+  <script src="assets/js/pages/uikit.js" defer></script>
   <script src="assets/js/pages/errors.js" defer></script>
 
   <script src="assets/js/main.js" defer></script>

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Daftar · Kontrol</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('kontrol:theme') || '"system"');
+        var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+  <button type="button" class="icon-btn theme-fab" data-theme-toggle aria-label="Ganti tema"></button>
+  <main class="auth">
+    <section class="auth__panel"><div class="auth__form">
+      <a href="index.html" class="brand" aria-label="Kontrol"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a>
+      <form data-auth="register" data-next="verify-email.html">
+        <h1 class="auth-title">Buat akun baru</h1>
+        <p class="text-secondary mt-2">Gratis 14 hari. Tanpa kartu kredit.</p>
+        <div class="stack mt-6" style="gap:14px">
+          <div class="form-grid">
+            <div class="field"><label class="label" for="name">Nama lengkap</label><input class="input" id="name" name="name" autocomplete="name" required minlength="3"></div>
+            <div class="field"><label class="label" for="company">Perusahaan</label><input class="input" id="company" name="company" autocomplete="organization" required></div>
+          </div>
+          <div class="field"><label class="label" for="email">Email kerja</label><input class="input" id="email" name="email" type="email" autocomplete="email" required><p class="help">Coba <span class="mono">fadly@kontrol.id</span> untuk melihat error “email terdaftar”.</p></div>
+          <div class="field"><label class="label" for="password">Kata sandi</label><div class="input-icon"><input class="input" id="password" name="password" type="password" autocomplete="new-password" required minlength="8" style="padding-right:44px"  data-strength="#password-meter"><span class="input-suffix"><button type="button" class="icon-btn icon-btn--sm" data-peek="#password" aria-label="Tampilkan kata sandi"><i data-lucide="eye"></i></button></span></div><div class="pw-meter" id="password-meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div><p class="help" id="password-meter-label">Minimal 8 karakter, kombinasikan huruf besar, angka &amp; simbol.</p></div>
+          <div class="field"><label class="label" for="password_confirmation">Ulangi kata sandi</label><input class="input" id="password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" required data-match="#password" data-msg-match="Konfirmasi kata sandi tidak cocok."></div>
+          <label class="check"><input type="checkbox" name="terms" required data-msg-required="Anda harus menyetujui ketentuan."> Saya setuju dengan <a href="#">Syarat</a> &amp; <a href="#">Kebijakan Privasi</a></label>
+          <button type="submit" class="btn btn-primary btn-lg btn-block"><i data-lucide="user-plus"></i><span>Buat akun</span></button>
+        </div>
+        <p class="auth-foot">Sudah punya akun? <a href="login.html">Masuk</a></p>
+      </form>
+    </div></section>
+    <aside class="auth__aside" aria-hidden="true">
+      <div class="auth__mock"><span></span><span></span><span></span><span></span></div>
+      <p class="auth__quote">“Mulai dalam hitungan menit: undang tim, atur peran, dan hubungkan aplikasi Anda.”</p>
+      <p class="mt-3" style="opacity:.8;font-size:13px">Kontrol Enterprise Admin</p>
+    </aside>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js"></script>
+  <script src="assets/js/core/validate.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

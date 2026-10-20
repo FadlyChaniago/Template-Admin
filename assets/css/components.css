@@ -610,3 +610,4 @@ kbd, .kbd {
 .section-label { font-size: var(--fs-2xs); font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
 .grid-side-main--wide { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); }
 @media (max-width: 1023px) { .grid-side-main--wide { grid-template-columns: minmax(0, 1fr); } }
+.input-icon:not(:has(> svg)) > .input { padding-left: 12px; } /* input dengan tombol suffix saja */

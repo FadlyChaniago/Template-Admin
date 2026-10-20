@@ -14,6 +14,14 @@
   /* ======================= USERS ======================= */
   K.page('users', {
     render(view, route) {
+      // Pola CRUD: #/users (list) · #/users/new · #/users/:id (detail) · #/users/:id/edit
+      const [id, sub] = route.params;
+      if (id === 'new') return userEdit(view, null);
+      if (id) {
+        const u = S.get('users', id);
+        if (!u) { view.innerHTML = K.ui.empty({ icon: 'user-x', title: 'Pengguna tidak ditemukan', text: 'Mungkin sudah dihapus.', action: '<a href="#/users" class="btn btn-secondary">Kembali ke daftar</a>' }); return; }
+        return sub === 'edit' ? userEdit(view, u) : userDetail(view, u);
+      }
       view.innerHTML = `${K.ui.pageHead({
         title: 'Users', eyebrow: 'Management', desc: 'Kelola anggota workspace, peran, dan status akses.',
         actions: `<button type="button" class="btn btn-secondary btn-sm" id="us-import">${icon('upload')}<span>Impor CSV</span></button>
@@ -39,7 +47,7 @@
         selects: [{ key: 'roleId', label: 'Semua peran', options: roleOptions() }, { key: 'team', label: 'Semua tim', options: teamOptions() }],
         defaultSort: { key: 'name', dir: 'asc' },
         columns: [
-          { key: 'name', label: 'Pengguna', sortable: true, render: r => K.ui.person(r) + (r.id === 'usr_me' ? '' : ''), csv: r => r.name },
+          { key: 'name', label: 'Pengguna', sortable: true, render: r => `<a href="#/users/${esc(r.id)}" class="row-link">${K.ui.person(r)}</a>`, csv: r => r.name },
           { key: 'email', label: 'Email', className: 'hidden', csv: r => r.email },
           { key: 'roleId', label: 'Peran', sortable: true, sortValue: r => K.lookup.role(r.roleId).name, render: r => roleChip(r.roleId), csv: r => K.lookup.role(r.roleId).name },
           { key: 'team', label: 'Tim', sortable: true, className: 'hide-md', render: r => `<span class="text-secondary">${esc(r.team)}</span>` },
@@ -49,7 +57,8 @@
         ],
         rowActions: r => `${K.ui.iconBtn('pencil', 'Edit ' + r.name, 'data-action="edit"')}
           <div class="menu-anchor">${K.ui.iconBtn('ellipsis', 'Aksi lainnya', 'data-menu-toggle aria-expanded="false"')}<div class="menu" role="menu">
-            <button type="button" class="menu__item" data-action="view">${icon('eye')}Lihat detail</button>
+            <button type="button" class="menu__item" data-action="view">${icon('eye')}Buka halaman detail</button>
+            <button type="button" class="menu__item" data-action="quick">${icon('panel-right')}Pratinjau cepat</button>
             ${r.status === 'invited' ? `<button type="button" class="menu__item" data-action="resend">${icon('send')}Kirim ulang undangan</button>` : ''}
             <button type="button" class="menu__item" data-action="reset">${icon('key-round')}Reset kata sandi</button>
             ${r.status === 'suspended' ? `<button type="button" class="menu__item" data-action="activate">${icon('user-check')}Aktifkan kembali</button>` : `<button type="button" class="menu__item" data-action="suspend" ${r.id === 'usr_me' ? 'disabled' : ''}>${icon('user-x')}Tangguhkan</button>`}
@@ -62,8 +71,9 @@
         ],
         onAction: (a, r) => {
           const done = (msg, sev = 'success') => { table.refresh(); kpis(); K.ui.toast(msg, r.name, sev); };
-          if (a === 'edit') openForm(r);
-          else if (a === 'view') showUser(r);
+          if (a === 'edit') K.router.go('users/' + r.id + '/edit');
+          else if (a === 'view') K.router.go('users/' + r.id);
+          else if (a === 'quick') showUser(r);
           else if (a === 'resend') K.ui.toast('Undangan dikirim ulang', r.email, 'info');
           else if (a === 'reset') K.ui.toast('Tautan reset dikirim', r.email, 'info');
           else if (a === 'suspend') { S.update('users', r.id, { status: 'suspended' }); S.audit('user.suspend', 'Menangguhkan pengguna', r.name, 'danger', 'User'); done('Pengguna ditangguhkan', 'warning'); }
@@ -103,8 +113,8 @@
             <div class="grid grid-2"><dl class="dl"><dt>Bergabung</dt><dd>${K.util.date(u.createdAt)}</dd><dt>Terakhir aktif</dt><dd>${u.lastActive ? K.util.ago(u.lastActive) : '—'}</dd><dt>ID</dt><dd class="mono text-xs">${esc(u.id)}</dd></dl>
             <div><p class="section-label">Izin peran (${role.permissions?.length || 0})</p><div class="chip-list">${(role.permissions || []).slice(0, 12).map(p => `<span class="chip mono" style="font-size:10.5px">${esc(p)}</span>`).join('')}${(role.permissions || []).length > 12 ? `<span class="chip">+${role.permissions.length - 12} lainnya</span>` : ''}</div></div></div>
             <div><p class="section-label">Aktivitas audit terbaru</p>${logs.length ? `<div class="list">${logs.map(l => `<div class="list-item"><span class="icon-tile">${icon('history')}</span><div class="list-item__body"><p class="list-item__title">${esc(l.label)}</p><p class="list-item__sub">${esc(l.resource)} · ${esc(l.ip)}</p></div><span class="list-item__meta">${K.util.ago(l.createdAt)}</span></div>`).join('')}</div>` : '<p class="text-secondary text-sm">Belum ada aktivitas tercatat.</p>'}</div>`,
-          footer: `<button type="button" class="btn btn-secondary" data-dismiss>Tutup</button><button type="button" class="btn btn-primary" data-edit>${icon('pencil')}<span>Edit pengguna</span></button>`,
-          onOpen: dlg => dlg.querySelector('[data-edit]').addEventListener('click', () => { dlg.close(); setTimeout(() => openForm(u), 80); }),
+          footer: `<button type="button" class="btn btn-secondary" data-dismiss>Tutup</button><a href="#/users/${esc(u.id)}" class="btn btn-secondary" data-dismiss-nav>${icon('external-link')}<span>Halaman detail</span></a><button type="button" class="btn btn-primary" data-edit>${icon('pencil')}<span>Edit cepat</span></button>`,
+          onOpen: dlg => { dlg.querySelector('[data-edit]').addEventListener('click', () => { dlg.close(); setTimeout(() => openForm(u), 80); }); dlg.querySelector('[data-dismiss-nav]').addEventListener('click', () => dlg.close()); },
         });
       }
 
@@ -129,6 +139,115 @@
       if (route.query.action === 'new') { history.replaceState(null, '', '#/users'); openForm(); }
     },
   });
+
+  /* ======================= USERS — DETAIL (pola CRUD) ======================= */
+  function userDetail(view, u) {
+    const role = K.lookup.role(u.roleId);
+    const teams = S.find('teams', t => t.members.includes(u.id) || t.lead === u.id);
+    const logs = S.find('auditLogs', l => l.actorId === u.id);
+    const pages = S.find('pages', p => p.authorId === u.id);
+    K.setCrumb('Users', u.name, '#/users');
+    view.innerHTML = `
+      <a href="#/users" class="back-link">${icon('arrow-left')}<span>Semua pengguna</span></a>
+      <section class="card detail-head">
+        <div class="flex items-center gap-4 wrap">
+          ${K.ui.avatar(u.name, 'xl')}
+          <div class="flex-1" style="min-width:220px">
+            <div class="flex items-center gap-2 wrap"><h1 id="page-title" tabindex="-1" style="font-size:24px;letter-spacing:-0.6px">${esc(u.name)}</h1>${K.ui.badge(u.status)}</div>
+            <p class="text-secondary text-sm mt-1">${esc(u.email)} · ${esc(u.team)}</p>
+            <div class="chip-list mt-3">${roleChip(u.roleId)}${u.twoFA ? '<span class="badge badge--success">2FA aktif</span>' : '<span class="badge badge--warning">2FA nonaktif</span>'}</div>
+          </div>
+          <div class="btn-group">
+            <a href="#/users/${esc(u.id)}/edit" class="btn btn-primary btn-sm">${icon('pencil')}<span>Edit</span></a>
+            <div class="menu-anchor"><button type="button" class="btn btn-secondary btn-sm" data-menu-toggle aria-expanded="false">${icon('ellipsis')}<span>Lainnya</span></button>
+              <div class="menu" role="menu">
+                <button type="button" class="menu__item" data-act="reset">${icon('key-round')}Kirim reset kata sandi</button>
+                <button type="button" class="menu__item" data-act="toggle">${icon(u.status === 'suspended' ? 'user-check' : 'user-x')}${u.status === 'suspended' ? 'Aktifkan kembali' : 'Tangguhkan'}</button>
+                <div class="menu__sep"></div>
+                <button type="button" class="menu__item menu__item--danger" data-act="delete" ${u.id === 'usr_me' ? 'disabled' : ''}>${icon('trash-2')}Hapus pengguna</button>
+              </div></div>
+          </div>
+        </div>
+        <div class="grid grid-4 mt-6 detail-stats">${[['Bergabung', K.util.date(u.createdAt)], ['Terakhir aktif', u.lastActive ? K.util.ago(u.lastActive) : 'Belum pernah'], ['Izin peran', role.permissions?.length || 0], ['Halaman ditulis', pages.length]].map(([l, v]) => `<div><p class="text-xs text-secondary">${l}</p><p class="fw-600 mt-1">${esc(v)}</p></div>`).join('')}</div>
+      </section>
+
+      <div class="tabs tabs--line mt-4" role="tablist" aria-label="Detail pengguna">
+        <button type="button" role="tab" class="tab" aria-selected="true" aria-controls="ud-ov" data-tab="ov">${icon('user')}Ringkasan</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="ud-act" data-tab="act" tabindex="-1">${icon('history')}Aktivitas <span class="count-pill">${logs.length}</span></button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="ud-perm" data-tab="perm" tabindex="-1">${icon('shield-check')}Izin</button>
+        <button type="button" role="tab" class="tab" aria-selected="false" aria-controls="ud-sec" data-tab="sec" tabindex="-1">${icon('lock')}Keamanan</button>
+      </div>
+      <div class="mt-4">
+        <div role="tabpanel" id="ud-ov" class="grid grid-main-side">
+          <article class="card"><h2 class="card__title">Informasi</h2>
+            <dl class="dl mt-4"><dt>Nama</dt><dd>${esc(u.name)}</dd><dt>Email</dt><dd>${esc(u.email)}</dd><dt>Telepon</dt><dd>${esc(u.phone || '—')}</dd><dt>Jabatan</dt><dd>${esc(u.title || '—')}</dd><dt>Lokasi</dt><dd>${esc(u.location || '—')}</dd><dt>Tim</dt><dd>${esc(u.team)}</dd><dt>Peran</dt><dd>${esc(role.name)}</dd><dt>ID</dt><dd class="mono text-xs">${esc(u.id)}</dd></dl></article>
+          <article class="card"><h2 class="card__title">Tim (${teams.length})</h2><div class="list mt-4">${teams.map(t => `<div class="list-item"><span class="avatar avatar--square" data-c="${t.color}">${esc(K.util.initials(t.name))}</span><div class="list-item__body"><p class="list-item__title">${esc(t.name)}</p><p class="list-item__sub">${t.members.length} anggota</p></div>${t.lead === u.id ? '<span class="badge badge--info">Lead</span>' : ''}</div>`).join('') || '<p class="text-sm text-secondary">Belum tergabung di tim.</p>'}</div></article>
+        </div>
+        <div role="tabpanel" id="ud-act" hidden><article class="card">${logs.length ? `<div class="timeline">${logs.slice(0, 15).map(l => `<div class="timeline-item"><span class="timeline-item__icon">${icon('history')}</span><div class="timeline-item__body flex wrap justify-between gap-2"><div><p class="fw-500">${esc(l.label)}</p><p class="timeline-item__time">${esc(l.resource)} · ${esc(l.ip)}</p></div>${K.ui.badge(l.severity)}</div></div>`).join('')}</div>` : K.ui.empty({ icon: 'history', title: 'Belum ada aktivitas' })}</article></div>
+        <div role="tabpanel" id="ud-perm" hidden><article class="card"><div class="flex justify-between items-center wrap gap-2"><div><h2 class="card__title">${esc(role.name)}</h2><p class="card__desc">${esc(role.description || '')}</p></div><a href="#/roles" class="btn btn-secondary btn-sm">Kelola peran</a></div>
+          <div class="chip-list mt-4">${(role.permissions || []).map(p => `<span class="chip mono" style="font-size:10.5px">${esc(p)}</span>`).join('')}</div></article></div>
+        <div role="tabpanel" id="ud-sec" hidden><article class="card"><div class="list">
+          <div class="list-item"><span class="icon-tile ${u.twoFA ? 'icon-tile--success' : 'icon-tile--warning'}">${icon(u.twoFA ? 'shield-check' : 'shield-off')}</span><div class="list-item__body"><p class="list-item__title">Autentikasi dua faktor</p><p class="list-item__sub">${u.twoFA ? 'Aktif via aplikasi authenticator' : 'Belum diaktifkan'}</p></div></div>
+          <div class="list-item"><span class="icon-tile">${icon('key-round')}</span><div class="list-item__body"><p class="list-item__title">Kata sandi</p><p class="list-item__sub">Terakhir diubah 64 hari lalu</p></div><button type="button" class="btn btn-secondary btn-sm" data-act="reset">Kirim reset</button></div>
+          <div class="list-item"><span class="icon-tile">${icon('monitor-smartphone')}</span><div class="list-item__body"><p class="list-item__title">Sesi aktif</p><p class="list-item__sub">2 perangkat</p></div><button type="button" class="btn btn-danger-ghost btn-sm" data-act="logout">Keluarkan semua</button></div>
+        </div></article></div>
+      </div>`;
+    K.ui.tabs(view);
+    view.addEventListener('click', e => {
+      const a = e.target.closest('[data-act]')?.dataset.act; if (!a) return;
+      if (a === 'reset') K.ui.toast('Tautan reset dikirim', u.email, 'info');
+      if (a === 'logout') K.ui.toast('Semua sesi dikeluarkan', u.name, 'warning');
+      if (a === 'toggle') { S.update('users', u.id, { status: u.status === 'suspended' ? 'active' : 'suspended' }); K.ui.toast(u.status === 'suspended' ? 'Pengguna ditangguhkan' : 'Pengguna diaktifkan', u.name); K.router.render(); }
+      if (a === 'delete') K.ui.confirm({ title: `Hapus ${u.name}?`, text: 'Akses akan dicabut segera.' }).then(ok => { if (ok) { S.remove('users', u.id); S.audit('user.delete', 'Menghapus pengguna', u.name, 'danger', 'User'); K.ui.toast('Pengguna dihapus'); K.router.go('users'); } });
+    });
+  }
+
+  /* ======================= USERS — CREATE / EDIT (halaman penuh) ======================= */
+  function userEdit(view, u) {
+    const isNew = !u;
+    K.setCrumb('Users', isNew ? 'Pengguna baru' : 'Edit ' + u.name, '#/users');
+    view.innerHTML = `
+      <a href="${isNew ? '#/users' : '#/users/' + esc(u.id)}" class="back-link">${icon('arrow-left')}<span>${isNew ? 'Semua pengguna' : esc(u.name)}</span></a>
+      ${K.ui.pageHead({ title: isNew ? 'Pengguna baru' : 'Edit pengguna', desc: isNew ? 'Lengkapi data lalu kirim undangan. Pengguna akan menerima email untuk mengatur kata sandi.' : 'Perubahan peran dan status langsung berlaku setelah disimpan.' })}
+      <form id="ue-form" class="stack" novalidate>
+        <article class="card"><div class="form-row" style="padding-top:0;border:0"><div class="form-row__label"><h2 class="card__title">Profil</h2><p class="help">Nama dan kontak yang terlihat oleh anggota lain.</p></div>
+          <div class="form-grid">
+            <div class="field"><label class="label" for="ue-name">Nama lengkap<span class="req">*</span></label><input class="input" id="ue-name" name="name" required minlength="3" value="${esc(u?.name || '')}"></div>
+            <div class="field"><label class="label" for="ue-email">Email<span class="req">*</span></label><input class="input" id="ue-email" name="email" type="email" required value="${esc(u?.email || '')}"></div>
+            <div class="field"><label class="label" for="ue-phone">Telepon</label><input class="input" id="ue-phone" name="phone" type="tel" pattern="(\\+62|0)8[0-9]{8,11}" data-msg-pattern="Format 08xxxxxxxxxx atau +628xxxxxxxxxx." value="${esc(u?.phone || '')}" placeholder="08xxxxxxxxxx"></div>
+            <div class="field"><label class="label" for="ue-title">Jabatan</label><input class="input" id="ue-title" name="title" value="${esc(u?.title || '')}"></div>
+            <div class="field span-2"><label class="label" for="ue-location">Lokasi</label><input class="input" id="ue-location" name="location" value="${esc(u?.location || '')}" placeholder="Kota, Negara"></div>
+          </div></div></article>
+        <article class="card"><div class="form-row" style="padding-top:0;border:0"><div class="form-row__label"><h2 class="card__title">Akses</h2><p class="help">Peran menentukan izin. Visibilitas menu bukan otorisasi — server tetap memeriksa izin.</p></div>
+          <div class="form-grid">
+            ${K.ui.field({ name: 'roleId', label: 'Peran', type: 'select', value: u?.roleId || 'role_viewer', options: roleOptions() })}
+            ${K.ui.field({ name: 'team', label: 'Tim', type: 'select', value: u?.team, options: teamOptions() })}
+            ${isNew ? '' : K.ui.field({ name: 'status', label: 'Status', type: 'select', value: u.status, options: [['active', 'Aktif'], ['invited', 'Diundang'], ['suspended', 'Ditangguhkan']] })}
+            <div class="field ${isNew ? '' : ''}"><span class="label">Keamanan</span>${K.ui.switchEl({ name: 'require2fa', checked: u ? (u.require2FA ?? u.twoFA) : true, label: 'Wajibkan 2FA saat login' })}</div>
+          </div></div></article>
+        ${isNew ? `<article class="card"><div class="form-row" style="padding-top:0;border:0"><div class="form-row__label"><h2 class="card__title">Undangan</h2><p class="help">Pesan opsional di email undangan.</p></div>
+          <div class="field"><label class="label" for="ue-msg">Pesan</label><textarea class="textarea" id="ue-msg" name="message" maxlength="300" placeholder="Halo! Bergabunglah dengan workspace kami."></textarea></div></div></article>` : ''}
+        <div class="save-bar save-bar--static"><span class="text-secondary">${isNew ? 'Kolom bertanda * wajib diisi.' : 'Terakhir diperbarui ' + K.util.ago(u.updatedAt || u.createdAt)}</span>
+          <div class="btn-group"><a href="${isNew ? '#/users' : '#/users/' + esc(u.id)}" class="btn btn-ghost">Batal</a><button type="submit" class="btn btn-primary">${icon(isNew ? 'send' : 'save')}<span>${isNew ? 'Simpan & kirim undangan' : 'Simpan perubahan'}</span></button></div></div>
+      </form>`;
+    const form = K.validate.attach(view.querySelector('#ue-form'));
+    let dirty = false;
+    form.addEventListener('input', () => { dirty = true; });
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!K.validate.form(form)) { K.ui.toast('Periksa kembali isian', '', 'error', 2200); return; }
+      const d = K.util.formData(form);
+      // Validasi unik (di backend: aturan unique:users,email) → tampil sebagai error field
+      if (S.all('users').some(x => x.email.toLowerCase() === d.email.toLowerCase() && x.id !== u?.id)) { K.validate.setErrors(form, { email: 'Email sudah digunakan pengguna lain.' }); return; }
+      const data = { name: d.name, email: d.email, phone: d.phone, title: d.title, location: d.location, roleId: d.roleId, team: d.team, require2FA: d.require2fa, updatedAt: new Date().toISOString() };
+      if (isNew) { const n = S.insert('users', { ...data, status: 'invited', lastActive: null, twoFA: false }, { idPrefix: 'usr' }); S.audit('user.invite', 'Mengundang pengguna', d.email, 'info', 'User'); dirty = false; K.ui.toast('Undangan terkirim', d.email); K.router.go('users/' + n.id); }
+      else { S.update('users', u.id, { ...data, status: d.status }); S.audit('user.update', 'Memperbarui pengguna', d.name, 'warning', 'User'); dirty = false; K.ui.toast('Perubahan disimpan', d.name); K.router.go('users/' + u.id); }
+    });
+    // Peringatan perubahan belum disimpan saat menutup tab
+    const warn = e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }
 
   /* ======================= TEAMS ======================= */
   K.page('teams', {

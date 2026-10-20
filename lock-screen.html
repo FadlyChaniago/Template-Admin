@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Sesi terkunci · Kontrol</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('kontrol:theme') || '"system"');
+        var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+  <button type="button" class="icon-btn theme-fab" data-theme-toggle aria-label="Ganti tema"></button>
+  <main class="auth auth--center">
+    <section class="auth__panel"><div style="text-align:center;margin-bottom:24px"><a href="index.html" class="brand" aria-label="Kontrol"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a></div>
+      <div class="auth__card">
+        <form data-auth="lock" data-next="index.html" style="text-align:center">
+          <p class="lock-clock" data-clock>11:30</p>
+          <p class="text-secondary mt-2" data-date></p>
+          <div class="mt-6"><span class="avatar lock-avatar" data-c="blue">FA</span><p class="fw-600" style="font-size:16px">Fadly Ahmad</p><p class="text-xs text-secondary">fadly@kontrol.id</p></div>
+          <p class="text-sm text-secondary mt-4">Sesi Anda dikunci setelah 15 menit tidak aktif.</p>
+          <div class="stack mt-5" style="gap:12px;text-align:left">
+            <div class="field"><label class="label" for="password">Kata sandi</label><div class="input-icon"><input class="input" id="password" name="password" type="password" autocomplete="current-password" required minlength="8" style="padding-right:44px"  ><span class="input-suffix"><button type="button" class="icon-btn icon-btn--sm" data-peek="#password" aria-label="Tampilkan kata sandi"><i data-lucide="eye"></i></button></span></div></div>
+            <button type="submit" class="btn btn-primary btn-lg btn-block"><i data-lucide="lock-open"></i><span>Buka kunci</span></button>
+          </div>
+          <p class="auth-foot">Bukan Anda? <a href="login.html">Masuk dengan akun lain</a></p>
+        </form>
+      </div>
+      <p class="auth-foot">© 2026 Kontrol · <a href="index.html#/help">Bantuan</a></p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js"></script>
+  <script src="assets/js/core/validate.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

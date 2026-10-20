@@ -113,6 +113,9 @@
           <article class="card"><h2 class="card__title">Kepadatan</h2><p class="card__desc">Atur ukuran teks dan jarak antar elemen.</p>
             <div class="choice-grid mt-5" role="radiogroup" aria-label="Kepadatan">${[['compact', 'Rapat', 'Lebih banyak data per layar', 'rows-4'], ['default', 'Standar', 'Seimbang (disarankan)', 'rows-3'], ['comfortable', 'Lega', 'Teks lebih besar', 'rows-2']].map(([v, l, d, ic]) => `<label class="choice"><input type="radio" name="density" value="${v}" ${density === v ? 'checked' : ''}><span class="icon-tile">${icon(ic)}</span><span class="choice__title">${l}</span><span class="choice__desc">${d}</span></label>`).join('')}</div>
           </article>
+          <article class="card"><h2 class="card__title">Tata letak navigasi</h2><p class="card__desc">Pilih menu di sisi kiri atau di bagian atas (desktop). Di layar kecil keduanya memakai drawer.</p>
+            <div class="choice-grid mt-5" role="radiogroup" aria-label="Tata letak navigasi">${[['sidebar', 'Sidebar kiri', 'Cocok untuk banyak modul'], ['topnav', 'Navigasi atas', 'Area konten lebih lebar']].map(([v, l, d]) => `<label class="choice"><input type="radio" name="layout" value="${v}" ${K.layout.get() === v ? 'checked' : ''}><span class="layout-preview layout-preview--${v}" aria-hidden="true"><span class="lp-nav"></span><span class="lp-body"><span></span><span></span></span></span><span class="choice__title">${l}</span><span class="choice__desc">${d}</span></label>`).join('')}</div>
+          </article>
           <article class="card"><h2 class="card__title">Sidebar</h2><p class="card__desc">Kondisi default sidebar di layar desktop (≥1024px).</p>
             <div class="choice-grid mt-5" role="radiogroup" aria-label="Sidebar">${[['expanded', 'Terbuka', 'Label menu terlihat (256px)', 'panel-left-open'], ['collapsed', 'Ciut', 'Hanya ikon (72px) + tooltip', 'panel-left-close']].map(([v, l, d, ic]) => `<label class="choice"><input type="radio" name="sidebar" value="${v}" ${sidebar === v ? 'checked' : ''}><span class="icon-tile">${icon(ic)}</span><span class="choice__title">${l}</span><span class="choice__desc">${d}</span></label>`).join('')}</div>
           </article>
@@ -124,6 +127,7 @@
         const t = e.target;
         if (t.name === 'theme') { K.theme.set(t.value); K.ui.toast('Tema diterapkan', t.parentElement.querySelector('.choice__title').textContent, 'success', 1800); }
         if (t.name === 'density') { K.prefs.set('kontrol:density', t.value); document.documentElement.dataset.density = t.value; K.ui.toast('Kepadatan diterapkan', '', 'success', 1800); }
+        if (t.name === 'layout') { K.layout.set(t.value); K.ui.toast('Tata letak diterapkan', t.value === 'topnav' ? 'Navigasi atas' : 'Sidebar kiri', 'success', 1800); }
         if (t.name === 'sidebar') { K.prefs.set('kontrol:sidebar', t.value); const app = document.getElementById('app'); if (app.dataset.sidebar !== t.value) document.getElementById('sidebar-toggle').click(); }
       });
     },

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Verifikasi email · Kontrol</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('kontrol:theme') || '"system"');
+        var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+  <link rel="stylesheet" href="assets/css/auth.css">
+</head>
+<body>
+  <button type="button" class="icon-btn theme-fab" data-theme-toggle aria-label="Ganti tema"></button>
+  <main class="auth auth--center">
+    <section class="auth__panel"><div style="text-align:center;margin-bottom:24px"><a href="index.html" class="brand" aria-label="Kontrol"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a></div>
+      <div class="auth__card">
+        <div style="text-align:center">
+          <div class="auth-icon" style="margin:0 auto 20px"><i data-lucide="mail-check"></i></div>
+          <h1 class="auth-title">Verifikasi email Anda</h1>
+          <p class="text-secondary mt-2">Kami telah mengirim tautan verifikasi ke <strong>fadly@kontrol.id</strong>. Klik tautan tersebut untuk mengaktifkan akun.</p>
+          <div class="alert alert--info mt-6" style="text-align:left"><i data-lucide="info"></i><div><p class="alert__title">Tidak menerima email?</p><p class="alert__text">Periksa folder spam/promosi, atau kirim ulang setelah 30 detik.</p></div></div>
+          <div class="alert alert--success mt-4" data-note hidden style="text-align:left"><i data-lucide="circle-check"></i><div><p class="alert__text"></p></div></div>
+          <div class="stack mt-6" style="gap:10px">
+            <a href="index.html" class="btn btn-primary btn-lg btn-block">Saya sudah verifikasi (demo)</a>
+            <button type="button" class="btn btn-secondary btn-block" data-resend="30">Kirim ulang email</button>
+            <a href="login.html" class="btn btn-ghost btn-block">Gunakan email lain</a>
+          </div>
+        </div>
+      </div>
+      <p class="auth-foot">© 2026 Kontrol · <a href="index.html#/help">Bantuan</a></p>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js"></script>
+  <script src="assets/js/core/validate.js"></script>
+  <script src="assets/js/auth.js"></script>
+</body>
+</html>

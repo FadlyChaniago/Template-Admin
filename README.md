@@ -44,7 +44,9 @@ Tidak perlu build — semua path relatif.
 ```
 kontrol-admin/
 ├── index.html              # App shell (sidebar, topbar, container view)
-├── login.html              # Halaman masuk standalone
+├── login.html, register.html, forgot-password.html, reset-password.html,
+│   verify-email.html, two-factor.html, lock-screen.html   # Auth standalone
+├── error.html, 404.html    # Halaman error standalone
 ├── assets/
 │   ├── css/
 │   │   ├── tokens.css      # Design tokens light/dark (warna, font, radius)
@@ -56,6 +58,8 @@ kontrol-admin/
 │   └── js/
 │       ├── core/
 │       │   ├── utils.js    # Format IDR/tanggal, escape HTML, CSV, PRNG
+│       │   ├── validate.js # Validasi form berbasis atribut HTML
+│       │   ├── errors-data.js # Data & renderer halaman error 4xx/5xx
 │       │   ├── data.js     # Data seed demo
 │       │   ├── store.js    # Repository in-memory + localStorage
 │       │   ├── ui.js       # Icon, toast, modal, confirm, form builder, menu
@@ -72,7 +76,10 @@ kontrol-admin/
 │       │   ├── preferences.js    # Settings, Appearance, Localization, Security
 │       │   ├── support.js        # Help Center, Documentation, Feedback
 │       │   ├── account.js        # Profile, Account Settings, Upgrade Plan
-│       │   └── errors.js         # 404 & 403
+│       │   ├── forms.js          # UI Kit: Forms & Wizard, Auth Pages
+│       │   ├── uikit.js          # UI Kit: Toasts, Icons, Charts, Tables, Errors
+│       │   └── errors.js         # 404, 403, #/error/:kode
+│       └── auth.js         # Perilaku halaman auth standalone
 │       └── main.js         # Entry point
 ```
 
@@ -110,6 +117,40 @@ kontrol-admin/
 | | Documentation | Referensi API, scrollspy, salin kode, unduh OpenAPI |
 | | Feedback | Formulir + rating, papan voting |
 | Akun | Profile / Account / Upgrade Plan | Profil, ganti email/sandi + meter kekuatan, setup 2FA + kode cadangan, paket & invoice |
+
+## Baru di v2
+
+| Area | Isi |
+|---|---|
+| **UI Kit** (grup sidebar baru) | Forms & Wizard, Toasts & Alerts, Icons (2.155 Lucide), Charts (10 jenis + sparkline), Tables & Pagination (client & server-side), Error Pages, Auth Pages |
+| **Error pages** | 13 kode 4xx/5xx dengan ikon — in-app `#/error/503`, standalone `error.html?code=503`, dan `404.html` (otomatis di GitHub Pages) |
+| **Auth pages** | `login`, `register`, `forgot-password`, `reset-password`, `verify-email`, `two-factor` (OTP 6 digit), `lock-screen` |
+| **Navigasi atas** | Appearance → Tata letak → *Navigasi atas*: grup menu jadi dropdown horizontal |
+| **Validasi form** | `K.validate` — aturan dari atribut HTML, validasi live, error server 422 |
+| **Pola CRUD** | Users: `#/users` → `#/users/:id` (detail + tab) → `#/users/:id/edit` / `#/users/new` |
+| **Toast API** | Tombol aksi (Undo), progress bar, jeda saat hover, 5 posisi |
+
+### Pola CRUD untuk modul baru
+
+```
+#/products            → list (K.DataTable)
+#/products/new        → form tambah (halaman penuh)
+#/products/:id        → detail (header + tab)
+#/products/:id/edit   → form edit
+```
+
+```js
+K.page('products', {
+  render(view, route) {
+    const [id, sub] = route.params;          // dari hash #/products/abc/edit
+    if (id === 'new') return productForm(view, null);
+    if (id) return sub === 'edit' ? productForm(view, find(id)) : productDetail(view, find(id));
+    return productList(view);
+  },
+});
+```
+
+Contoh lengkap: `userDetail()` dan `userEdit()` di `assets/js/pages/management.js`.
 
 ## Fitur global
 

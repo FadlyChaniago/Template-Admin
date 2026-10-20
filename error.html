@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Error · Kontrol</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <!--
+    Halaman error standalone untuk dipasang di web server:
+      error.html?code=500   → tampilkan kode tertentu
+    Nginx : error_page 500 502 503 504 /error.html?code=$status;
+    Laravel: salin markup ke resources/views/errors/{kode}.blade.php
+  -->
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('kontrol:theme') || '"system"');
+        var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+</head>
+<body class="errpage-body" data-default-code="500">
+  <header class="errpage-top">
+    <a href="index.html" class="flex items-center gap-2" style="color:var(--text-strong);text-decoration:none" aria-label="Kontrol">
+      <span class="brand-mark" style="width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--primary);color:#fff"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span>
+      <span style="font-size:22px;font-weight:700;letter-spacing:-1px">kontrol<span style="color:var(--primary)">.</span></span>
+    </a>
+  </header>
+  <main id="err" class="errpage-main"></main>
+  <footer class="errpage-foot">© 2026 Kontrol · <a href="index.html#/help">Pusat bantuan</a></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js"></script>
+  <script src="assets/js/core/errors-data.js"></script>
+  <script>
+    (function () {
+      var code = parseInt(new URLSearchParams(location.search).get('code') || document.body.dataset.defaultCode, 10);
+      var root = document.getElementById('err');
+      root.innerHTML = K.renderError(code);
+      document.title = code + ' · ' + (K.errorsData[code] || K.errorsData[404]).title + ' · Kontrol';
+      K.bindError(root);
+      if (window.lucide) lucide.createIcons({ attrs: { 'stroke-width': 1.8 } });
+    })();
+  </script>
+</body>
+</html>
