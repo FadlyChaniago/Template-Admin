@@ -22,7 +22,7 @@
       }
       const inner = node.map(([tag, attrs]) =>
         `<${tag} ${Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(' ')}/>`).join('');
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="${esc(cls)}" aria-hidden="true" focusable="false">${inner}</svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="${esc(cls)}" aria-hidden="true" focusable="false">${inner}</svg>`;
       iconCache.set(key, svg);
       return svg;
     },
