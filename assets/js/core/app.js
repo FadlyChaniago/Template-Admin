@@ -160,7 +160,7 @@
       const f = K.favorites.list(); const on = !f.includes(id);
       LS.set('kontrol:favs', on ? [...f, id] : f.filter(x => x !== id));
       K.ui.toast(t(on ? 'shell.pinned' : 'shell.unpinned'), K.navLabel(id), 'success', 1600);
-      renderSidebar(); syncPin();
+      renderSidebar(); renderTopnav(); syncPin();
     },
   };
   const recent = {
@@ -201,8 +201,22 @@
       if (items.length === 1) { const it = items[0]; return `<li><a href="#/${it.id}" class="topnav__link" data-nav="${it.id}">${icon(it.icon)}<span>${esc(label(it))}</span></a></li>`; }
       return `<li class="menu-anchor"><button type="button" class="topnav__link" data-menu-toggle aria-expanded="false" aria-haspopup="true" data-group="${esc(g.group)}">${icon(groupIcon[g.group] || 'folder')}<span>${esc(groupLabel(g.group))}</span>${icon('chevron-down', 'topnav__caret')}</button>
         <div class="menu menu--left topnav__menu">${items.map(it => { const b = it.badge ? it.badge() : 0; return `<a href="#/${it.id}" class="menu__item" data-nav="${it.id}">${icon(it.icon)}<span class="flex-1">${esc(label(it))}</span>${b ? `<span class="nav-link__badge">${b}</span>` : ''}</a>`; }).join('')}</div></li>`;
-    }).join('');
+    }).join('') + favTopnav();
     markActive();
+  }
+  /* Dropdown Favorit di navigasi atas: daftar favorit + tombol favoritkan halaman aktif */
+  function favTopnav() {
+    const favs = K.favorites.list().map(id => navIndex.get(id)).filter(it => !it.perm || K.can(it.perm));
+    const list = favs.map(it => `<a href="#/${it.id}" class="menu__item" data-nav="${it.id}">${icon(it.icon)}<span class="flex-1">${esc(label(it))}</span></a>`).join('');
+    return `<li class="menu-anchor topnav__fav"><button type="button" class="topnav__link" data-menu-toggle aria-expanded="false" aria-haspopup="true">${icon('star')}<span>${esc(groupLabel('Favorit'))}</span>${favs.length ? `<span class="nav-link__badge">${favs.length}</span>` : ''}${icon('chevron-down', 'topnav__caret')}</button>
+      <div class="menu topnav__menu">${list || `<p class="menu__empty">${esc(t('shell.favEmpty'))}</p>`}<div class="menu__sep"></div><button type="button" class="menu__item" data-fav-toggle>${icon('star')}<span class="flex-1"></span></button></div></li>`;
+  }
+  function syncFavToggle() {
+    const b = document.querySelector('#topnav-list [data-fav-toggle]'); if (!b) return;
+    const id = router.current?.id, ok = id && navIndex.has(id) && id !== 'error';
+    b.hidden = !ok; if (!ok) return;
+    const on = K.favorites.has(id);
+    b.innerHTML = `${icon(on ? 'star-off' : 'star')}<span class="flex-1">${esc(t(on ? 'shell.unpin' : 'shell.pin'))}</span>`;
   }
 
   K.layout = {
@@ -443,6 +457,7 @@
   };
 
   function syncPin() {
+    syncFavToggle();
     const b = $('#pin-toggle'); if (!b) return;
     const id = router.current?.id, ok = id && navIndex.has(id) && id !== 'error';
     b.hidden = !ok; if (!ok) return;
@@ -491,6 +506,11 @@
 
     $('#theme-toggle').addEventListener('click', () => K.theme.toggle());
     $('#search-trigger').addEventListener('click', openPalette);
+    $('#topnav-list')?.addEventListener('click', e => {
+      if (!e.target.closest('[data-fav-toggle]') || !router.current) return;
+      K.ui.closeMenu(e.target.closest('.menu'));
+      K.favorites.toggle(router.current.id);
+    });
     $('#pin-toggle').addEventListener('click', () => router.current && K.favorites.toggle(router.current.id));
     $('#viewas-exit').addEventListener('click', () => K.viewAs.set(null));
     $('#notif-menu').addEventListener('click', e => {

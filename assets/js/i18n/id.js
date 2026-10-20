@@ -26,7 +26,7 @@ K.i18n.add('id', {
   'shell.notifications': 'Notifikasi', 'shell.new': '{n} baru', 'shell.markRead': 'Tandai dibaca', 'shell.viewAll': 'Lihat semua notifikasi', 'shell.allRead': 'Semua notifikasi ditandai dibaca',
   'shell.dataNote': 'Data ilustratif', 'shell.footerLang': 'Bahasa Indonesia · IDR',
   'shell.offline': 'Anda sedang offline. Perubahan akan disimpan saat koneksi kembali.', 'shell.online': 'Koneksi kembali normal',
-  'shell.pin': 'Tambahkan ke favorit', 'shell.unpin': 'Hapus dari favorit', 'shell.pinned': 'Ditambahkan ke favorit', 'shell.unpinned': 'Dihapus dari favorit',
+  'shell.favEmpty': 'Belum ada favorit. Tekan F atau tombol di bawah.', 'shell.pin': 'Tambahkan ke favorit', 'shell.unpin': 'Hapus dari favorit', 'shell.pinned': 'Ditambahkan ke favorit', 'shell.unpinned': 'Dihapus dari favorit',
   'shell.viewAs': 'Mode pratinjau peran: {role}. Menu & tombol mengikuti izin peran ini.', 'shell.viewAsExit': 'Keluar dari pratinjau',
 
   /* Command palette & pintasan */

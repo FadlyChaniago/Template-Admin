@@ -175,7 +175,7 @@ button.nav-group__head:hover { color: var(--primary); }
 }
 .search-trigger:hover { border-color: var(--border-strong); }
 .search-trigger svg { width: 16px; height: 16px; flex-shrink: 0; }
-.search-trigger span { flex: 1; }
+.search-trigger span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .sys-status { display: flex; align-items: center; gap: 6px; font-size: var(--fs-2xs); color: var(--text-secondary); white-space: nowrap; padding: 0 6px; }
 .sys-status__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 20%, transparent); }
@@ -282,7 +282,7 @@ body.no-scroll { overflow: hidden; }
     background: var(--bg-surface); border-bottom: 1px solid var(--border);
   }
   .topnav__list {
-    list-style: none; display: flex; align-items: center; gap: 2px;
+    list-style: none; display: flex; flex-wrap: wrap; align-items: center; gap: 2px; /* wrap = pengaman bila menu kustom bertambah */
     max-width: calc(var(--content-max) + 64px); margin: 0 auto; padding: 6px 32px;
   }
   .topnav__link {
@@ -296,10 +296,17 @@ body.no-scroll { overflow: hidden; }
   .topnav__link:hover, .topnav__link[aria-expanded="true"] { background: var(--bg-raised); color: var(--text-strong); text-decoration: none; }
   .topnav__link[aria-current="page"], .topnav__link.is-active { background: var(--nav-active-bg); color: var(--nav-active-fg); }
   .topnav__menu { min-width: 230px; }
+  /* Grup paling kanan: dropdown rata kanan agar tidak keluar layar */
+  [data-layout="topnav"] #pin-toggle { display: none; } /* favorit pindah ke dropdown Favorit */
+  .topnav__fav { margin-left: auto; }
+  .topnav__fav .nav-link__badge { margin-left: 0; }
+  .topnav__menu .menu__empty { padding: 10px 12px; max-width: 230px; font-size: var(--fs-xs); color: var(--text-secondary); }
+  .topnav__list > li:nth-last-child(-n+3) .topnav__menu { left: auto; right: 0; }
   .topnav__menu .menu__item[aria-current="page"] { background: var(--nav-active-bg); color: var(--nav-active-fg); font-weight: 600; }
   .topnav__menu .menu__item[aria-current="page"] svg { color: inherit; }
 }
-@media (min-width: 1024px) and (max-width: 1279px) {
+/* 10 grup menu butuh ±1400px dengan ikon → mode ringkas (tanpa ikon) di bawah 1440px */
+@media (min-width: 1024px) and (max-width: 1439px) {
   .topnav__list { padding: 6px 16px; }
   .topnav__link { padding: 0 8px; gap: 6px; }
   .topnav__link > svg:first-child { display: none; }

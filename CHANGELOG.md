@@ -34,6 +34,11 @@ Rilis final: fondasi integrasi backend, modul workflow, dan audit kualitas.
 ### Diperbaiki
 - 0 pelanggaran axe-core WCAG 2 A/AA pada 17 rute × 2 tema (sebelumnya: kontras, label progress/switch, ARIA kalender & inbox, region scroll tanpa fokus, link dalam teks).
 - Cincin fokus tidak lagi muncul pada judul halaman yang difokus otomatis saat pindah rute.
+- Navigasi atas: halaman bisa tergeser ke kanan di lebar 1024–1439px (mode ringkas diperluas, dropdown grup paling kanan rata kanan, `flex-wrap` sebagai pengaman).
+- Navigasi atas: dropdown **Favorit** baru (daftar favorit + favoritkan halaman ini); bintang favorit tidak lagi nyasar di samping logo.
+- Ikon tanpa aturan ukuran CSS melar memenuhi kartu (mis. Template cepat di Reports) — kini default 18px.
+- Maps: error `_leaflet_pos` saat pindah halaman ketika animasi peta masih berjalan.
+- Kotak cari di topbar tidak lagi terpotong 2 baris pada layar sempit.
 
 ## [3.0.0] — Tools
 

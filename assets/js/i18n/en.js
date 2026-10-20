@@ -11,7 +11,7 @@ K.i18n.add('en', {
   'shell.notifications': 'Notifications', 'shell.new': '{n} new', 'shell.markRead': 'Mark as read', 'shell.viewAll': 'View all notifications', 'shell.allRead': 'All notifications marked as read',
   'shell.dataNote': 'Illustrative data', 'shell.footerLang': 'English · IDR',
   'shell.offline': 'You are offline. Changes will sync when the connection is back.', 'shell.online': 'Back online',
-  'shell.pin': 'Add to favorites', 'shell.unpin': 'Remove from favorites', 'shell.pinned': 'Added to favorites', 'shell.unpinned': 'Removed from favorites',
+  'shell.favEmpty': 'No favorites yet. Press F or use the button below.', 'shell.pin': 'Add to favorites', 'shell.unpin': 'Remove from favorites', 'shell.pinned': 'Added to favorites', 'shell.unpinned': 'Removed from favorites',
   'shell.viewAs': 'Role preview mode: {role}. Menus & buttons follow this role’s permissions.', 'shell.viewAsExit': 'Exit preview',
 
   'palette.title': 'Search', 'palette.placeholder': 'Search pages, data, or actions…', 'palette.nav': 'Navigation', 'palette.actions': 'Quick actions', 'palette.prefs': 'Preferences',

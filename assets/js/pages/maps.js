@@ -25,7 +25,7 @@
 
   K.page('maps', {
     render(view) {
-      let map, cluster, markers = new Map(), alive = true;
+      let map, cluster, markers = new Map(), alive = true, sizeTimer;
       const filters = { status: new Set(Object.keys(ST)), type: '', q: '' };
       const all = S.all('locations');
       const count = s => all.filter(l => l.status === s).length;
@@ -101,13 +101,17 @@
         });
         map.addLayer(cluster);
         drawMarkers();
-        map.fitBounds(cluster.getBounds(), { padding: [30, 30] });
-        setTimeout(() => map.invalidateSize(), 200);
+        map.fitBounds(cluster.getBounds(), { padding: [30, 30], animate: false }); // tanpa animasi awal: aman bila pengguna langsung pindah halaman
+        sizeTimer = setTimeout(() => alive && map.invalidateSize(), 200);
       }).catch(err => { $('#mp-map').innerHTML = K.ui.empty({ icon: 'map-pin-off', title: 'Peta gagal dimuat', text: err.message }); });
 
       const onResize = () => map && map.invalidateSize();
       addEventListener('resize', onResize);
-      return () => { alive = false; removeEventListener('resize', onResize); if (map) map.remove(); };
+      return () => {
+        alive = false; clearTimeout(sizeTimer); removeEventListener('resize', onResize);
+        // Hentikan animasi zoom/pan yang masih berjalan sebelum dihapus (mencegah error _leaflet_pos)
+        if (map) { try { map.stop(); map.off(); map.remove(); } catch { /* peta sudah terlepas */ } map = null; }
+      };
     },
   });
 })(window.K);
