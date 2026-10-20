@@ -1,0 +1,177 @@
+/* ==========================================================================
+   Kontrol — Design Tokens
+   Satu sumber kebenaran untuk warna, tipografi, spacing, radius.
+   Light = default (:root). Dark = [data-theme="dark"] pada <html>.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --bg-page: #F8FAFC;
+  --bg-surface: #FFFFFF;        /* sidebar + toolbar */
+  --bg-panel: #FFFFFF;          /* cards */
+  --bg-raised: #F8FAFC;         /* inset / hover / table head */
+  --bg-input: #FFFFFF;
+  --bg-overlay: rgba(11, 17, 32, 0.45);
+
+  /* Text */
+  --text-strong: #0F172A;
+  --text-secondary: #64748B;
+  --text-muted: #94A3B8;
+
+  /* Lines */
+  --border: #E2E8F0;
+  --border-strong: #CBD5E1;
+
+  /* Brand */
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-active: #1E40AF;
+  --primary-contrast: #FFFFFF;
+  --primary-soft: #EFF6FF;
+  --primary-soft-hover: #DBEAFE;
+  --nav-active-bg: #EFF6FF;
+  --nav-active-fg: #2563EB;
+  --focus: #93C5FD;
+
+  /* Charts */
+  --chart-1: #3B82F6;
+  --chart-2: #93C5FD;
+  --chart-fill: rgba(219, 234, 254, 0.65);
+  --chart-grid: #E2E8F0;
+  --chart-c1: #3B82F6;
+  --chart-c2: #10B981;
+  --chart-c3: #F59E0B;
+  --chart-c4: #F43F5E;
+  --chart-c5: #8B5CF6;
+  --chart-c6: #06B6D4;
+
+  /* Status */
+  --success: #059669;
+  --success-bg: #ECFDF5;
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-hover: #B91C1C;
+  --info: #2563EB;
+  --info-bg: #EFF6FF;
+  --neutral-bg: #F1F5F9;
+
+  /* Avatar pastels */
+  --av-blue-bg: #DBEAFE;    --av-blue-fg: #1D4ED8;
+  --av-emerald-bg: #D1FAE5; --av-emerald-fg: #047857;
+  --av-amber-bg: #FEF3C7;   --av-amber-fg: #B45309;
+  --av-rose-bg: #FFE4E6;    --av-rose-fg: #BE123C;
+  --av-violet-bg: #EDE9FE;  --av-violet-fg: #6D28D9;
+  --av-sky-bg: #E0F2FE;     --av-sky-fg: #0369A1;
+
+  /* Typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --fs-2xs: 10px;
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-base: 13px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-kpi: 27px;
+  --fs-h1: 28px;
+
+  /* Geometry */
+  --radius-sm: 6px;
+  --radius: 8px;      /* controls */
+  --radius-lg: 12px;  /* cards */
+  --radius-full: 999px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+
+  /* Layout */
+  --sidebar-w: 256px;
+  --sidebar-w-collapsed: 72px;
+  --topbar-h: 72px;
+  --content-max: 1320px;
+  --drawer-w: min(280px, 100vw);
+
+  /* Effects */
+  --shadow-pop: 0 10px 30px -10px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(15, 23, 42, 0.06);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --dur: 200ms;
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg-page: #0B1120;
+  --bg-surface: #111827;
+  --bg-panel: #151E2E;
+  --bg-raised: #1E293B;
+  --bg-input: #151E2E;
+  --bg-overlay: rgba(2, 6, 23, 0.65);
+
+  --text-strong: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --border: #273449;
+  --border-strong: #334155;
+
+  --primary: #3B82F6;
+  --primary-hover: #60A5FA;
+  --primary-active: #2563EB;
+  --primary-contrast: #FFFFFF;
+  --primary-soft: #172B4D;
+  --primary-soft-hover: #1E3A5F;
+  --nav-active-bg: #172B4D;
+  --nav-active-fg: #93C5FD;
+  --focus: #60A5FA;
+
+  --chart-1: #60A5FA;
+  --chart-2: #93C5FD;
+  --chart-fill: rgba(30, 58, 95, 0.6);
+  --chart-grid: #273449;
+  --chart-c1: #60A5FA;
+  --chart-c2: #34D399;
+  --chart-c3: #FBBF24;
+  --chart-c4: #FB7185;
+  --chart-c5: #A78BFA;
+  --chart-c6: #22D3EE;
+
+  --success: #34D399;
+  --success-bg: #052E2B;
+  --warning: #FBBF24;
+  --warning-bg: #422006;
+  --danger: #F87171;
+  --danger-bg: #450A0A;
+  --danger-hover: #FCA5A5;
+  --info: #93C5FD;
+  --info-bg: #172B4D;
+  --neutral-bg: #1E293B;
+
+  --av-blue-bg: #172B4D;    --av-blue-fg: #93C5FD;
+  --av-emerald-bg: #052E2B; --av-emerald-fg: #34D399;
+  --av-amber-bg: #422006;   --av-amber-fg: #FBBF24;
+  --av-rose-bg: #450A0A;    --av-rose-fg: #FDA4AF;
+  --av-violet-bg: #2E1065;  --av-violet-fg: #C4B5FD;
+  --av-sky-bg: #0C2A44;     --av-sky-fg: #7DD3FC;
+
+  --shadow-pop: 0 12px 32px -8px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-sm: none;
+}
+
+/* Kepadatan (diatur dari halaman Appearance) */
+[data-density="compact"] {
+  --fs-base: 12px;
+  --sp-5: 16px;
+  --sp-6: 20px;
+}
+[data-density="comfortable"] {
+  --fs-base: 14px;
+}
+
+/* Hormati preferensi gerak pengguna */
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

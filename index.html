@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id" class="is-loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Kontrol — enterprise admin dashboard (HTML, CSS, JavaScript murni).">
+  <meta name="theme-color" content="#FFFFFF">
+  <title>Dashboard · Kontrol</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+
+  <!-- Terapkan tema SEBELUM CSS dimuat untuk mencegah kedipan (FOUC) -->
+  <script>
+    (function () {
+      try {
+        var p = JSON.parse(localStorage.getItem('kontrol:theme') || '"system"');
+        var dark = p === 'dark' || (p === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        var d = JSON.parse(localStorage.getItem('kontrol:density') || '"default"');
+        document.documentElement.dataset.density = d;
+      } catch (e) { document.documentElement.dataset.theme = 'light'; }
+    })();
+  </script>
+
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/pages.css">
+</head>
+<body>
+  <a class="skip-link" href="#view">Lewati ke konten utama</a>
+
+  <div class="app" id="app" data-sidebar="expanded">
+
+    <!-- ================= Sidebar (desktop: tetap · mobile: drawer) ================= -->
+    <aside class="sidebar" id="sidebar" aria-label="Navigasi utama">
+      <div class="sidebar__brand">
+        <a href="#/dashboard" class="flex items-center gap-2" style="gap:10px;color:inherit;text-decoration:none" aria-label="Kontrol — ke Dashboard" data-tip="Dashboard">
+          <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span>
+          <span class="brand-word">kontrol<span>.</span></span>
+        </a>
+        <button type="button" class="icon-btn sidebar__close" id="drawer-close" aria-label="Tutup menu" data-icon="x"></button>
+      </div>
+
+      <nav class="sidebar__nav" id="sidebar-nav" aria-label="Menu administrasi"></nav>
+
+      <div class="sidebar__footer">
+        <div class="upgrade-card">
+          <p class="upgrade-card__title">Ruang untuk berkembang</p>
+          <p class="upgrade-card__text">Lebih banyak akses. Lebih banyak kemungkinan.</p>
+          <a href="#/billing" class="btn btn-primary btn-sm"><span>Upgrade Plan</span><span data-icon="arrow-up-right"></span></a>
+        </div>
+        <div class="menu-anchor">
+          <button type="button" class="account-btn" data-menu-toggle aria-expanded="false" aria-haspopup="menu" data-tip="Profil & akun">
+            <span class="avatar" data-me-avatar>FA</span>
+            <span class="account-btn__meta"><span class="account-btn__name truncate" data-me-name>Fadly Ahmad</span><span class="account-btn__role" data-me-role>Workspace Admin</span></span>
+            <span data-icon="chevrons-up-down"></span>
+          </button>
+          <div class="menu menu--up" role="menu" style="width:220px">
+            <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span>User Profile</a>
+            <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span>Account Settings</a>
+            <a href="#/billing" class="menu__item" role="menuitem"><span data-icon="sparkles"></span>Upgrade Plan</a>
+            <div class="menu__sep"></div>
+            <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span>Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true"></div>
+    <div class="nav-tooltip" id="nav-tooltip" role="tooltip"></div>
+
+    <!-- ================= Main ================= -->
+    <div class="main-wrap">
+      <header class="topbar">
+        <div class="topbar__left">
+          <button type="button" class="icon-btn" id="drawer-open" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" data-mobile-only data-icon="menu"></button>
+          <button type="button" class="icon-btn" id="sidebar-toggle" aria-controls="sidebar" data-desktop-only></button>
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <span class="breadcrumb__parent" id="crumb-parent">Overview</span>
+            <span data-icon="chevron-right"></span>
+            <span class="breadcrumb__current" id="crumb-current" aria-current="page">Dashboard</span>
+          </nav>
+        </div>
+
+        <div class="topbar__right">
+          <button type="button" class="search-trigger" id="search-trigger" aria-label="Cari di workspace (Ctrl+K)">
+            <span data-icon="search" style="display:contents"></span><span>Cari di workspace…</span><kbd>Ctrl K</kbd>
+          </button>
+          <span class="sys-status"><span class="sys-status__dot"></span>Sistem normal</span>
+          <div class="topbar__divider"></div>
+          <button type="button" class="icon-btn" id="theme-toggle" aria-label="Ganti tema"></button>
+
+          <div class="menu-anchor">
+            <button type="button" class="icon-btn" id="notif-toggle" data-menu-toggle aria-expanded="false" aria-haspopup="true" aria-label="Notifikasi">
+              <span data-icon="bell" style="display:contents"></span><span class="notif-dot" id="notif-dot"></span>
+            </button>
+            <div class="menu notif-menu" id="notif-menu"></div>
+          </div>
+
+          <div class="menu-anchor">
+            <button type="button" class="flex items-center gap-2" style="min-height:44px;padding:0 4px;border-radius:8px" data-menu-toggle aria-expanded="false" aria-haspopup="menu" aria-label="Menu akun">
+              <span class="avatar" data-me-avatar>FA</span>
+              <span class="text-muted" data-icon="chevron-down" style="display:inline-flex;width:14px"></span>
+            </button>
+            <div class="menu" role="menu" style="width:230px">
+              <div class="menu__header"><p class="fw-600" data-me-name>Fadly Ahmad</p><p class="text-xs text-secondary" data-me-email>fadly@kontrol.id</p></div>
+              <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span>User Profile</a>
+              <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span>Account Settings</a>
+              <a href="#/appearance" class="menu__item" role="menuitem"><span data-icon="palette"></span>Appearance</a>
+              <div class="menu__sep"></div>
+              <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span>Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content" id="main">
+        <div class="content-inner" id="view" tabindex="-1" aria-live="polite"></div>
+      </main>
+
+      <footer class="app-footer">
+        <div class="app-footer__inner">
+          <p>© 2026 Kontrol <span class="sep">/</span> Admin Workspace</p>
+          <div class="flex items-center gap-3 wrap">
+            <span class="flex items-center gap-2"><span style="width:6px;height:6px;border-radius:50%;background:var(--chart-1)"></span>Data ilustratif</span>
+            <span class="text-muted">Bahasa Indonesia · IDR</span>
+            <span class="text-muted">v1.0.0</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+  <!-- Library pihak ketiga via CDN (versi dikunci) -->
+  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" defer></script>
+
+  <!-- Core -->
+  <script src="assets/js/core/utils.js" defer></script>
+  <script src="assets/js/core/data.js" defer></script>
+  <script src="assets/js/core/store.js" defer></script>
+  <script src="assets/js/core/ui.js" defer></script>
+  <script src="assets/js/core/table.js" defer></script>
+  <script src="assets/js/core/charts.js" defer></script>
+  <script src="assets/js/core/app.js" defer></script>
+
+  <!-- Modul halaman -->
+  <script src="assets/js/pages/overview.js" defer></script>
+  <script src="assets/js/pages/workspace.js" defer></script>
+  <script src="assets/js/pages/management.js" defer></script>
+  <script src="assets/js/pages/content.js" defer></script>
+  <script src="assets/js/pages/applications.js" defer></script>
+  <script src="assets/js/pages/system.js" defer></script>
+  <script src="assets/js/pages/preferences.js" defer></script>
+  <script src="assets/js/pages/support.js" defer></script>
+  <script src="assets/js/pages/account.js" defer></script>
+  <script src="assets/js/pages/errors.js" defer></script>
+
+  <script src="assets/js/main.js" defer></script>
+</body>
+</html>
