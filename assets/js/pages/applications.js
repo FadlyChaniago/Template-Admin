@@ -176,7 +176,7 @@
       const set = S.settings();
       view.innerHTML = `${K.ui.pageHead({
         title: 'API Management', eyebrow: 'Applications', desc: 'Kelola API key, pantau penggunaan, dan batas laju (rate limit).',
-        actions: `<a href="#/docs" class="btn btn-secondary btn-sm">${icon('book-open')}<span>Referensi API</span></a><button type="button" class="btn btn-primary btn-sm" id="api-new">${icon('key-round')}<span>Buat API key</span></button>`,
+        actions: `<a href="#/docs" class="btn btn-secondary btn-sm">${icon('book-open')}<span>Referensi API</span></a><button type="button" class="btn btn-primary btn-sm" id="api-new" data-perm="api.create">${icon('key-round')}<span>Buat API key</span></button>`,
       })}
         <div class="grid grid-4">
           ${K.ui.kpi({ label: 'Request hari ini', value: num(48213), icon: 'arrow-left-right', trend: 5.2, foot: 'vs kemarin' })}

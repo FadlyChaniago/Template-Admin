@@ -21,7 +21,7 @@
   class DataTable {
     constructor(root, opts) {
       this.root = root;
-      this.o = Object.assign({ pageSize: 8, selectable: false, exportName: null, searchPlaceholder: 'Cari…' }, opts);
+      this.o = Object.assign({ pageSize: 8, selectable: false, exportName: null, searchPlaceholder: K.t('common.search') }, opts);
       this.state = { q: '', tab: 'all', selects: {}, sort: this.o.defaultSort || null, page: 1, selected: new Set() };
       this.root.classList.add('card', 'card--flush');
       this.mount();
@@ -63,7 +63,7 @@
 
       const selects = (o.selects || []).map(s => `<select class="select select-sm" style="width:auto;min-width:150px" data-select="${s.key}" aria-label="${esc(s.label)}"><option value="">${esc(s.label)}</option>${s.options.map(([v, l]) => `<option value="${esc(v)}">${esc(l)}</option>`).join('')}</select>`).join('');
 
-      const exportBtn = o.exportName ? `<button type="button" class="btn btn-secondary btn-sm" data-export>${icon('download')}<span>Ekspor CSV</span></button>` : '';
+      const exportBtn = o.exportName ? `<button type="button" class="btn btn-secondary btn-sm" data-export>${icon('download')}<span>${esc(K.t('table.exportCsv'))}</span></button>` : '';
 
       this.root.innerHTML = `${head}${tabs}
         <div class="dt-toolbar">
@@ -75,7 +75,7 @@
         </div>
         <div class="dt-bulk" data-bulk hidden></div>
         <div class="table-wrap" tabindex="0" role="region" aria-label="${esc(o.title || 'Tabel data')}"><table class="table"><thead data-thead></thead><tbody data-tbody></tbody></table></div>
-        <div class="dt-foot"><p data-info aria-live="polite"></p><nav class="pagination" aria-label="Paginasi" data-pager></nav></div>`;
+        <div class="dt-foot"><p data-info aria-live="polite"></p><nav class="pagination" aria-label="${esc(K.t('table.pagination'))}" data-pager></nav></div>`;
     }
 
     bind() {
@@ -144,43 +144,44 @@
       // Tabs dengan jumlah
       if (o.tabs) {
         const count = v => v === 'all' ? all.length : all.filter(r => (o.tabs.match ? o.tabs.match(r, v) : String(r[o.tabs.key]) === v)).length;
-        R.querySelector('[data-tabs]').innerHTML = [['all', o.tabs.allLabel || 'Semua'], ...o.tabs.options]
+        R.querySelector('[data-tabs]').innerHTML = [['all', o.tabs.allLabel || K.t('common.all')], ...o.tabs.options]
           .map(([v, l]) => `<button type="button" role="tab" class="tab" data-tab-value="${esc(v)}" aria-selected="${s.tab === v}">${esc(l)} <span class="count-pill">${count(v)}</span></button>`).join('');
       }
 
       // Header
       const allChecked = pageRows.length > 0 && pageRows.every(r => s.selected.has(r.id));
       R.querySelector('[data-thead]').innerHTML = `<tr>
-        ${o.selectable ? `<th class="col-check"><input type="checkbox" data-check-all aria-label="Pilih semua di halaman ini" ${allChecked ? 'checked' : ''}></th>` : ''}
+        ${o.selectable ? `<th class="col-check"><input type="checkbox" data-check-all aria-label="${esc(K.t('table.selectAll'))}" ${allChecked ? 'checked' : ''}></th>` : ''}
         ${o.columns.map(c => {
           const dir = s.sort && s.sort.key === c.key ? s.sort.dir : null;
           const aria = dir ? ` aria-sort="${dir === 'asc' ? 'ascending' : 'descending'}"` : '';
           const inner = c.sortable ? `<button type="button" class="th-sort" data-sort="${c.key}" ${dir ? `data-dir="${dir}"` : ''}>${esc(c.label)}${icon(dir === 'asc' ? 'arrow-up' : dir === 'desc' ? 'arrow-down' : 'arrow-up-down')}</button>` : esc(c.label);
           return `<th scope="col" class="${c.className || ''}"${aria}>${inner}</th>`;
         }).join('')}
-        ${o.rowActions ? '<th scope="col" class="col-actions"><span class="sr-only">Aksi</span></th>' : ''}
+        ${o.rowActions ? `<th scope="col" class="col-actions"><span class="sr-only">${esc(K.t('table.actions'))}</span></th>` : ''}
       </tr>`;
 
       // Body
       const colCount = o.columns.length + (o.selectable ? 1 : 0) + (o.rowActions ? 1 : 0);
       R.querySelector('[data-tbody]').innerHTML = pageRows.length ? pageRows.map(r => `<tr data-id="${esc(r.id)}" class="${s.selected.has(r.id) ? 'is-selected' : ''}">
-        ${o.selectable ? `<td class="col-check"><input type="checkbox" data-check value="${esc(r.id)}" aria-label="Pilih baris" ${s.selected.has(r.id) ? 'checked' : ''}></td>` : ''}
+        ${o.selectable ? `<td class="col-check"><input type="checkbox" data-check value="${esc(r.id)}" aria-label="${esc(K.t('table.selectRow'))}" ${s.selected.has(r.id) ? 'checked' : ''}></td>` : ''}
         ${o.columns.map(c => `<td class="${c.className || ''}">${c.render ? c.render(r) : esc(r[c.key])}</td>`).join('')}
         ${o.rowActions ? `<td class="col-actions"><div class="row-actions">${o.rowActions(r)}</div></td>` : ''}
-      </tr>`).join('') : `<tr><td colspan="${colCount}">${K.ui.empty(o.empty || { icon: 'search-x', title: 'Tidak ada hasil', text: 'Coba ubah kata kunci atau filter Anda.' })}</td></tr>`;
+      </tr>`).join('') : `<tr><td colspan="${colCount}">${K.ui.empty(o.empty || { icon: 'search-x', title: K.t('table.noResult'), text: K.t('table.noResultText') })}</td></tr>`;
 
       // Bulk bar
       const bulk = R.querySelector('[data-bulk]');
       if (o.bulkActions && s.selected.size) {
         bulk.hidden = false;
-        bulk.innerHTML = `<span>${s.selected.size} dipilih</span><button type="button" class="btn btn-ghost btn-sm" data-bulk-clear>Batal pilih</button><div class="btn-group">${o.bulkActions.map((a, i) => `<button type="button" class="btn btn-sm ${a.variant === 'danger' ? 'btn-danger' : 'btn-secondary'}" data-bulk-action="${i}">${a.icon ? icon(a.icon) : ''}<span>${esc(a.label)}</span></button>`).join('')}</div>`;
+        bulk.innerHTML = `<span>${esc(K.t('table.selected', { n: s.selected.size }))}</span><button type="button" class="btn btn-ghost btn-sm" data-bulk-clear>${esc(K.t('table.clearSel'))}</button><div class="btn-group">${o.bulkActions.map((a, i) => `<button type="button" class="btn btn-sm ${a.variant === 'danger' ? 'btn-danger' : 'btn-secondary'}" data-bulk-action="${i}">${a.icon ? icon(a.icon) : ''}<span>${esc(a.label)}</span></button>`).join('')}</div>`;
       } else bulk.hidden = true;
 
       // Info + pager
       R.querySelector('[data-info]').textContent = rows.length
-        ? `Menampilkan ${start + 1}–${start + pageRows.length} dari ${K.util.num(rows.length)}${rows.length !== all.length ? ` (difilter dari ${K.util.num(all.length)})` : ''}`
-        : 'Tidak ada data yang cocok';
+        ? K.t('table.showing', { from: start + 1, to: start + pageRows.length, total: K.util.num(rows.length) }) + (rows.length !== all.length ? K.t('table.filtered', { all: K.util.num(all.length) }) : '')
+        : K.t('table.none');
       R.querySelector('[data-pager]').innerHTML = this.pager(s.page, pages);
+      K.applyPerms && K.applyPerms(R);
       o.afterRender && o.afterRender(this);
     }
 
@@ -189,8 +190,8 @@
       const list = [];
       const range = new Set([1, total, cur - 1, cur, cur + 1].filter(p => p >= 1 && p <= total));
       let prev = 0;
-      [...range].sort((a, b) => a - b).forEach(p => { if (p - prev > 1) list.push('<span class="pg-gap" aria-hidden="true">…</span>'); list.push(btn(p, p, `aria-label="Halaman ${p}"`)); prev = p; });
-      return `<button type="button" class="pg-edge" data-page="${cur - 1}" ${cur <= 1 ? 'disabled' : ''} aria-label="Halaman sebelumnya">${icon('chevron-left')}</button>${list.join('')}<button type="button" class="pg-edge" data-page="${cur + 1}" ${cur >= total ? 'disabled' : ''} aria-label="Halaman berikutnya">${icon('chevron-right')}</button>`;
+      [...range].sort((a, b) => a - b).forEach(p => { if (p - prev > 1) list.push('<span class="pg-gap" aria-hidden="true">…</span>'); list.push(btn(p, p, `aria-label="${esc(K.t('table.page', { n: p }))}"`)); prev = p; });
+      return `<button type="button" class="pg-edge" data-page="${cur - 1}" ${cur <= 1 ? 'disabled' : ''} aria-label="${esc(K.t('table.prev'))}">${icon('chevron-left')}</button>${list.join('')}<button type="button" class="pg-edge" data-page="${cur + 1}" ${cur >= total ? 'disabled' : ''} aria-label="${esc(K.t('table.next'))}">${icon('chevron-right')}</button>`;
     }
 
     exportCSV() {
@@ -198,7 +199,7 @@
       const csv = K.util.toCSV(this.filtered(), cols);
       const name = `${this.o.exportName}-${new Date().toISOString().slice(0, 10)}.csv`;
       K.util.downloadFile(name, '﻿' + csv, 'text/csv');
-      K.ui.toast('Ekspor selesai', `${name} telah diunduh.`);
+      K.ui.toast(K.t('table.exported'), K.t('table.exportedText', { file: name }));
     }
 
     refresh() { this.update(); }

@@ -1,0 +1,46 @@
+# Deploy statis ke GitHub Pages — tanpa build step.
+# Aktifkan: Settings → Pages → Build and deployment → Source: GitHub Actions
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Cek cepat: semua file JS valid secara sintaks
+      - name: Syntax check
+        run: |
+          for f in $(find assets/js -name '*.js'); do node --check "$f"; done
+
+      # Hanya file yang dibutuhkan situs (tanpa docs/, .github/, *.md)
+      - name: Stage site
+        run: |
+          mkdir -p _site
+          cp -r assets *.html _site/
+          cp LICENSE _site/ 2>/dev/null || true
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

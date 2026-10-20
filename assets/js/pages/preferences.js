@@ -15,22 +15,22 @@
     form.addEventListener('input', check); form.addEventListener('change', check);
     return { reset() { base = snap(); check(); } };
   }
-  const saveBar = id => `<div class="save-bar" id="${id}" hidden><span>${icon('circle-alert')}Ada perubahan yang belum disimpan</span><div class="btn-group"><button type="reset" class="btn btn-ghost btn-sm">Batalkan</button><button type="submit" class="btn btn-primary btn-sm">${icon('save')}<span>Simpan perubahan</span></button></div></div>`;
+  const saveBar = id => `<div class="save-bar" id="${id}" hidden><span>${icon('circle-alert')}${esc(K.t('settings.unsaved'))}</span><div class="btn-group"><button type="reset" class="btn btn-ghost btn-sm">${esc(K.t('settings.discard'))}</button><button type="submit" class="btn btn-primary btn-sm" data-perm="settings.update" data-perm-mode="disable">${icon('save')}<span>${esc(K.t('settings.saveChanges'))}</span></button></div></div>`;
 
   /* ======================= GENERAL SETTINGS ======================= */
   K.page('settings', {
     render(view) {
       const s = S.settings();
-      view.innerHTML = `${K.ui.pageHead({ title: 'General Settings', eyebrow: 'Preferences', desc: 'Profil workspace, preferensi email, data, dan zona berbahaya.' })}
+      view.innerHTML = `${K.ui.pageHead({ title: K.navLabel('settings'), eyebrow: 'Preferences', desc: esc(K.t('settings.desc')) })}
         <div class="settings-layout">
           <nav class="settings-nav" aria-label="Bagian pengaturan">
-            <a href="#sec-workspace" data-scroll>${icon('building-2')}Workspace</a><a href="#sec-email" data-scroll>${icon('mail')}Email</a>
-            <a href="#sec-data" data-scroll>${icon('database')}Data &amp; ekspor</a><a href="#sec-danger" data-scroll>${icon('triangle-alert')}Zona berbahaya</a>
+            <a href="#sec-workspace" data-scroll>${icon('building-2')}${esc(K.t('settings.nav.workspace'))}</a><a href="#sec-email" data-scroll>${icon('mail')}${esc(K.t('settings.nav.email'))}</a>
+            <a href="#sec-data" data-scroll>${icon('database')}${esc(K.t('settings.nav.data'))}</a><a href="#sec-danger" data-scroll>${icon('triangle-alert')}${esc(K.t('settings.nav.danger'))}</a>
           </nav>
           <div class="stack">
             <form class="card" id="st-form" novalidate>
               <section id="sec-workspace">
-                <h2 class="card__title">Profil workspace</h2><p class="card__desc">Informasi ini terlihat oleh seluruh anggota.</p>
+                <h2 class="card__title">${esc(K.t('settings.workspace'))}</h2><p class="card__desc">${esc(K.t('settings.workspaceDesc'))}</p>
                 <div class="mt-5">
                   <div class="form-row"><div class="form-row__label"><span class="label">Logo</span><span class="help">PNG atau SVG persegi, minimal 256px.</span></div>
                     <div class="flex items-center gap-4 wrap"><span class="brand-mark" style="width:56px;height:56px;border-radius:14px" id="st-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:30px;height:30px"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span>
@@ -44,7 +44,7 @@
               <section id="sec-email" class="mt-6" style="border-top:1px solid var(--border);padding-top:24px">
                 <h2 class="card__title">Email workspace</h2><p class="card__desc">Ringkasan dan pembaruan yang dikirim ke admin.</p>
                 <div class="stack mt-5" style="gap:16px">
-                  ${[['emailDigest', 'Ringkasan harian', 'Aktivitas penting dalam 24 jam terakhir.'], ['weeklyReport', 'Laporan mingguan', 'Metrik utama setiap Senin pagi.'], ['productUpdates', 'Pembaruan produk', 'Fitur baru dan catatan rilis.'], ['securityAlerts', 'Peringatan keamanan', 'Login mencurigakan dan perubahan izin (disarankan aktif).']].map(([n, l, h]) => `<div class="flex items-center justify-between gap-4"><div><p class="fw-500">${l}</p><p class="text-xs text-secondary">${h}</p></div>${K.ui.switchEl({ name: n, checked: s[n] })}</div>`).join('')}
+                  ${[['emailDigest', 'Ringkasan harian', 'Aktivitas penting dalam 24 jam terakhir.'], ['weeklyReport', 'Laporan mingguan', 'Metrik utama setiap Senin pagi.'], ['productUpdates', 'Pembaruan produk', 'Fitur baru dan catatan rilis.'], ['securityAlerts', 'Peringatan keamanan', 'Login mencurigakan dan perubahan izin (disarankan aktif).']].map(([n, l, h]) => `<div class="flex items-center justify-between gap-4"><div><p class="fw-500">${l}</p><p class="text-xs text-secondary">${h}</p></div>${K.ui.switchEl({ name: n, checked: s[n], ariaLabel: l })}</div>`).join('')}
                 </div>
               </section>
               ${saveBar('st-save')}
@@ -71,7 +71,7 @@
         form.querySelectorAll('[required]').forEach(el => el.setAttribute('aria-invalid', !el.checkValidity()));
         if (bad) { bad.focus(); K.ui.toast('Periksa kembali isian', bad.validationMessage, 'error'); return; }
         S.saveSettings(K.util.formData(form)); S.audit('settings.update', 'Mengubah pengaturan umum', 'Workspace', 'warning');
-        dirty.reset(); K.ui.toast('Pengaturan disimpan');
+        dirty.reset(); K.ui.toast(K.t('settings.saved'));
       });
       $('#st-logo-input').addEventListener('change', e => { const f = e.target.files[0]; if (!f) return; $('#st-logo').innerHTML = `<img src="${URL.createObjectURL(f)}" alt="Logo workspace" style="width:100%;height:100%;object-fit:cover;border-radius:14px">`; $('#st-logo').style.background = 'transparent'; K.ui.toast('Logo diperbarui', 'Pratinjau lokal (demo).'); });
       $('#st-logo-reset').addEventListener('click', () => K.router.render());
@@ -143,7 +143,7 @@
           <form class="card" id="lc-form" novalidate>
             <h2 class="card__title">Regional</h2><p class="card__desc">Berlaku untuk seluruh anggota workspace.</p>
             <div class="form-grid mt-5">
-              ${K.ui.field({ name: 'language', label: 'Bahasa antarmuka', type: 'select', value: s.language, options: [['id', 'Bahasa Indonesia'], ['en', 'English'], ['ms', 'Bahasa Melayu']] })}
+              ${K.ui.field({ name: 'language', label: 'Bahasa antarmuka', type: 'select', value: K.i18n.lang, options: [['id', 'Bahasa Indonesia'], ['en', 'English']], help: 'Berlaku untuk browser ini. Cakupan terjemahan: shell, komponen inti, Dashboard, Users, Settings, halaman error.' })}
               ${K.ui.field({ name: 'timezone', label: 'Zona waktu', type: 'select', value: s.timezone, options: tz })}
               ${K.ui.field({ name: 'currency', label: 'Mata uang', type: 'select', value: s.currency, options: [['IDR', 'IDR — Rupiah'], ['USD', 'USD — US Dollar'], ['SGD', 'SGD — Singapore Dollar'], ['MYR', 'MYR — Ringgit']] })}
               ${K.ui.field({ name: 'numberFormat', label: 'Format angka', type: 'select', value: s.numberFormat, options: [['id-ID', '1.234.567,89'], ['en-US', '1,234,567.89']] })}
@@ -170,7 +170,7 @@
       const dirty = dirtyTracker(form, $('#lc-save'));
       form.addEventListener('change', preview);
       form.addEventListener('reset', () => setTimeout(() => { dirty.reset(); preview(); }, 0));
-      form.addEventListener('submit', e => { e.preventDefault(); S.saveSettings(K.util.formData(form)); S.audit('settings.update', 'Mengubah lokalisasi', 'Localization', 'info'); dirty.reset(); K.ui.toast('Pengaturan regional disimpan'); });
+      form.addEventListener('submit', e => { e.preventDefault(); const d = K.util.formData(form); S.saveSettings(d); S.audit('settings.update', 'Mengubah lokalisasi', 'Localization', 'info'); dirty.reset(); K.ui.toast(d.language === 'en' ? 'Regional settings saved' : 'Pengaturan regional disimpan'); if (d.language !== K.i18n.lang) setTimeout(() => K.i18n.set(d.language), 300); });
       preview();
     },
   });
@@ -193,7 +193,7 @@
               <div class="form-row"><div class="form-row__label"><span class="label">Wajibkan 2FA</span><span class="help">Anggota tanpa 2FA diminta mengaktifkannya saat login berikutnya. Cakupan saat ini ${twofaPct}%.</span></div>${K.ui.switchEl({ name: 'enforce2FA', checked: s.enforce2FA, label: 'Aktif untuk semua peran' })}</div>
               <div class="form-row"><div class="form-row__label"><label class="label" for="f_passwordMinLength">Panjang kata sandi minimum</label><span class="help">NIST menyarankan minimal 8; kami sarankan 12+.</span></div><div><input class="range" type="range" min="8" max="24" id="f_passwordMinLength" name="passwordMinLength" value="${s.passwordMinLength}"><p class="text-sm fw-600 mt-1"><span data-pwlen>${s.passwordMinLength}</span> karakter</p></div></div>
               <div class="form-row"><div class="form-row__label"><span class="label">Kompleksitas</span></div>${K.ui.switchEl({ name: 'requireSymbols', checked: s.requireSymbols, label: 'Wajib angka & simbol' })}</div>
-              <div class="form-row"><div class="form-row__label"><label class="label" for="f_sessionTimeout">Batas waktu sesi idle</label></div><select class="select" id="f_sessionTimeout" name="sessionTimeout">${[[15, '15 menit'], [30, '30 menit'], [60, '1 jam'], [240, '4 jam'], [1440, '24 jam']].map(([v, l]) => `<option value="${v}" ${+s.sessionTimeout === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+              <div class="form-row"><div class="form-row__label"><label class="label" for="f_sessionTimeout">Batas waktu sesi idle</label><span class="help">Setelah idle, layar dikunci (peringatan 60 detik sebelumnya).</span></div><div><select class="select" id="f_sessionTimeout" name="sessionTimeout">${[[15, '15 menit'], [30, '30 menit'], [60, '1 jam'], [240, '4 jam'], [1440, '24 jam']].map(([v, l]) => `<option value="${v}" ${+s.sessionTimeout === v ? 'selected' : ''}>${l}</option>`).join('')}</select><button type="button" class="btn btn-ghost btn-sm mt-2" onclick="K.session.preview()">${icon('timer')}<span>Coba peringatan sesi</span></button></div></div>
               <div class="form-row"><div class="form-row__label"><label class="label" for="f_ipAllowlist">IP allowlist</label><span class="help">Satu CIDR per baris. Kosongkan untuk mengizinkan semua IP.</span></div><textarea class="textarea mono" id="f_ipAllowlist" name="ipAllowlist" placeholder="103.28.12.0/24&#10;36.84.51.207/32" style="min-height:84px">${esc(s.ipAllowlist)}</textarea></div>
               <div class="form-row"><div class="form-row__label"><span class="label">Single Sign-On (SAML / OIDC)</span><span class="help">Gunakan IdP perusahaan Anda.</span></div><div class="stack" style="gap:10px">${K.ui.switchEl({ name: 'ssoEnabled', checked: s.ssoEnabled, label: 'Aktifkan SSO' })}<input class="input" name="ssoUrl" type="url" placeholder="https://idp.perusahaan.id/saml/metadata" value="${esc(s.ssoUrl || '')}" aria-label="URL metadata IdP"></div></div>
             </div>

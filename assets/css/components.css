@@ -15,8 +15,8 @@
 .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
 .btn:disabled, .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
 
-.btn-primary { background: var(--primary); color: var(--primary-contrast); }
-.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-primary { background: var(--primary-solid); color: var(--primary-contrast); }
+.btn-primary:hover:not(:disabled) { background: var(--primary-solid-hover); }
 .btn-primary:active:not(:disabled) { background: var(--primary-active); }
 
 .btn-secondary { background: var(--bg-panel); color: var(--text-strong); border-color: var(--border); }
@@ -611,3 +611,7 @@ kbd, .kbd {
 .grid-side-main--wide { grid-template-columns: minmax(0, 340px) minmax(0, 1fr); }
 @media (max-width: 1023px) { .grid-side-main--wide { grid-template-columns: minmax(0, 1fr); } }
 .input-icon:not(:has(> svg)) > .input { padding-left: 12px; } /* input dengan tombol suffix saja */
+
+/* Link di dalam teks harus terbedakan selain warna (WCAG 1.4.1) */
+.alert__text a, .help a, p a:not(.btn) { text-decoration: underline; text-underline-offset: 2px; }
+.alert__text a { color: var(--text-strong); font-weight: 500; }

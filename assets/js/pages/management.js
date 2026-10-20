@@ -23,9 +23,9 @@
         return sub === 'edit' ? userEdit(view, u) : userDetail(view, u);
       }
       view.innerHTML = `${K.ui.pageHead({
-        title: 'Users', eyebrow: 'Management', desc: 'Kelola anggota workspace, peran, dan status akses.',
-        actions: `<button type="button" class="btn btn-secondary btn-sm" id="us-import">${icon('upload')}<span>Impor CSV</span></button>
-          <button type="button" class="btn btn-primary btn-sm" id="us-new">${icon('user-plus')}<span>Undang pengguna</span></button>`,
+        title: K.navLabel('users'), eyebrow: 'Management', desc: esc(K.t('users.desc')),
+        actions: `<button type="button" class="btn btn-secondary btn-sm" id="us-import" data-perm="users.create">${icon('upload')}<span>${esc(K.t('users.import'))}</span></button>
+          <button type="button" class="btn btn-primary btn-sm" id="us-new" data-perm="users.create">${icon('user-plus')}<span>${esc(K.t('users.invite'))}</span></button>`,
       })}<div class="grid grid-4" id="us-kpis"></div><div class="mt-4" id="us-table"></div>`;
       const $ = s => view.querySelector(s);
 
@@ -33,29 +33,29 @@
         const u = S.all('users');
         const twofa = u.filter(x => x.twoFA).length;
         $('#us-kpis').innerHTML = [
-          K.ui.kpi({ label: 'Total pengguna', value: num(u.length), icon: 'users', trend: 6.4 }),
-          K.ui.kpi({ label: 'Aktif', value: num(u.filter(x => x.status === 'active').length), icon: 'user-check', foot: 'login dalam 30 hari' }),
-          K.ui.kpi({ label: 'Undangan tertunda', value: num(u.filter(x => x.status === 'invited').length), icon: 'mail', foot: 'belum diterima' }),
-          K.ui.kpi({ label: 'Cakupan 2FA', value: `${num((twofa / u.length) * 100, 0)}<small>%</small>`, icon: 'shield-check', foot: `${twofa} dari ${u.length} pengguna` }),
+          K.ui.kpi({ label: K.t('users.kpi.total'), value: num(u.length), icon: 'users', trend: 6.4 }),
+          K.ui.kpi({ label: K.t('users.kpi.active'), value: num(u.filter(x => x.status === 'active').length), icon: 'user-check', foot: K.t('users.kpi.activeFoot') }),
+          K.ui.kpi({ label: K.t('users.kpi.invited'), value: num(u.filter(x => x.status === 'invited').length), icon: 'mail', foot: K.t('users.kpi.invitedFoot') }),
+          K.ui.kpi({ label: K.t('users.kpi.2fa'), value: `${num((twofa / u.length) * 100, 0)}<small>%</small>`, icon: 'shield-check', foot: K.t('users.kpi.2faFoot', { n: twofa, total: u.length }) }),
         ].join('');
       };
 
       const table = new K.DataTable($('#us-table'), {
-        title: 'Semua pengguna', rows: () => S.all('users'), selectable: true, pageSize: 10, exportName: 'pengguna',
-        searchPlaceholder: 'Cari nama atau email…', search: r => r.name + ' ' + r.email,
-        tabs: { key: 'status', options: [['active', 'Aktif'], ['invited', 'Diundang'], ['suspended', 'Ditangguhkan']] },
-        selects: [{ key: 'roleId', label: 'Semua peran', options: roleOptions() }, { key: 'team', label: 'Semua tim', options: teamOptions() }],
+        title: K.t('users.table'), rows: () => S.all('users'), selectable: true, pageSize: 10, exportName: 'pengguna',
+        searchPlaceholder: K.t('users.search'), search: r => r.name + ' ' + r.email,
+        tabs: { key: 'status', options: [['active', K.t('users.tab.active')], ['invited', K.t('users.tab.invited')], ['suspended', K.t('users.tab.suspended')]] },
+        selects: [{ key: 'roleId', label: K.t('users.allRoles'), options: roleOptions() }, { key: 'team', label: K.t('users.allTeams'), options: teamOptions() }],
         defaultSort: { key: 'name', dir: 'asc' },
         columns: [
-          { key: 'name', label: 'Pengguna', sortable: true, render: r => `<a href="#/users/${esc(r.id)}" class="row-link">${K.ui.person(r)}</a>`, csv: r => r.name },
+          { key: 'name', label: K.t('users.col.user'), sortable: true, render: r => `<a href="#/users/${esc(r.id)}" class="row-link">${K.ui.person(r)}</a>`, csv: r => r.name },
           { key: 'email', label: 'Email', className: 'hidden', csv: r => r.email },
-          { key: 'roleId', label: 'Peran', sortable: true, sortValue: r => K.lookup.role(r.roleId).name, render: r => roleChip(r.roleId), csv: r => K.lookup.role(r.roleId).name },
-          { key: 'team', label: 'Tim', sortable: true, className: 'hide-md', render: r => `<span class="text-secondary">${esc(r.team)}</span>` },
+          { key: 'roleId', label: K.t('users.col.role'), sortable: true, sortValue: r => K.lookup.role(r.roleId).name, render: r => roleChip(r.roleId), csv: r => K.lookup.role(r.roleId).name },
+          { key: 'team', label: K.t('users.col.team'), sortable: true, className: 'hide-md', render: r => `<span class="text-secondary">${esc(r.team)}</span>` },
           { key: 'twoFA', label: '2FA', className: 'hide-lg', render: r => r.twoFA ? `<span class="text-success" title="2FA aktif">${icon('shield-check', 'i-16')}</span>` : `<span class="text-muted" title="2FA nonaktif">${icon('shield-off', 'i-16')}</span>`, csv: r => (r.twoFA ? 'Ya' : 'Tidak') },
-          { key: 'lastActive', label: 'Terakhir aktif', sortable: true, className: 'hide-sm nowrap', sortValue: r => r.lastActive || '', render: r => r.lastActive ? `<span class="text-secondary">${K.util.ago(r.lastActive)}</span>` : '<span class="text-muted">Belum pernah</span>' },
-          { key: 'status', label: 'Status', render: r => K.ui.badge(r.status) },
+          { key: 'lastActive', label: K.t('users.col.lastActive'), sortable: true, className: 'hide-sm nowrap', sortValue: r => r.lastActive || '', render: r => r.lastActive ? `<span class="text-secondary">${K.util.ago(r.lastActive)}</span>` : `<span class="text-muted">${esc(K.t('users.never'))}</span>` },
+          { key: 'status', label: K.t('users.col.status'), render: r => K.ui.badge(r.status) },
         ],
-        rowActions: r => `${K.ui.iconBtn('pencil', 'Edit ' + r.name, 'data-action="edit"')}
+        rowActions: r => `${K.ui.iconBtn('pencil', 'Edit ' + r.name, 'data-action="edit" data-perm="users.update"')}
           <div class="menu-anchor">${K.ui.iconBtn('ellipsis', 'Aksi lainnya', 'data-menu-toggle aria-expanded="false"')}<div class="menu" role="menu">
             <button type="button" class="menu__item" data-action="view">${icon('eye')}Buka halaman detail</button>
             <button type="button" class="menu__item" data-action="quick">${icon('panel-right')}Pratinjau cepat</button>
@@ -63,7 +63,7 @@
             <button type="button" class="menu__item" data-action="reset">${icon('key-round')}Reset kata sandi</button>
             ${r.status === 'suspended' ? `<button type="button" class="menu__item" data-action="activate">${icon('user-check')}Aktifkan kembali</button>` : `<button type="button" class="menu__item" data-action="suspend" ${r.id === 'usr_me' ? 'disabled' : ''}>${icon('user-x')}Tangguhkan</button>`}
             <div class="menu__sep"></div>
-            <button type="button" class="menu__item menu__item--danger" data-action="delete" ${r.id === 'usr_me' ? 'disabled' : ''}>${icon('trash-2')}Hapus pengguna</button></div></div>`,
+            <button type="button" class="menu__item menu__item--danger" data-action="delete" data-perm="users.delete" ${r.id === 'usr_me' ? 'disabled' : ''}>${icon('trash-2')}Hapus pengguna</button></div></div>`,
         bulkActions: [
           { label: 'Aktifkan', icon: 'user-check', handler: ids => { S.updateWhere('users', u => ids.includes(u.id), { status: 'active' }); kpis(); K.ui.toast(`${ids.length} pengguna diaktifkan`); } },
           { label: 'Tangguhkan', icon: 'user-x', handler: ids => { const t = ids.filter(i => i !== 'usr_me'); S.updateWhere('users', u => t.includes(u.id), { status: 'suspended' }); kpis(); K.ui.toast(`${t.length} pengguna ditangguhkan`, '', 'warning'); } },
@@ -407,7 +407,7 @@
 
       view.innerHTML = `${K.ui.pageHead({
         title: 'Roles & Permissions', eyebrow: 'Management', desc: 'Tentukan peran dan izin granular untuk setiap modul. Visibilitas menu mengikuti izin <strong>view</strong>.',
-        actions: `<button type="button" class="btn btn-primary btn-sm" id="rl-new">${icon('plus')}<span>Peran baru</span></button>`,
+        actions: `<button type="button" class="btn btn-primary btn-sm" id="rl-new" data-perm="roles.create">${icon('plus')}<span>Peran baru</span></button>`,
       })}
       <div class="alert alert--info" style="margin-bottom:16px">${icon('info')}<div><p class="alert__title">Penting untuk implementasi</p><p class="alert__text">Menyembunyikan menu bukan otorisasi. Setiap route dan endpoint API wajib memeriksa izin yang sama di sisi server.</p></div></div>
       <div class="grid grid-side-main">
@@ -435,6 +435,7 @@
         $('#rl-detail').innerHTML = `
           <div class="card__head"><div><h2 class="card__title">${esc(r.name)}</h2><p class="card__desc">${esc(r.description)}</p></div>
             <div class="btn-group">${!r.system ? `<button type="button" class="btn btn-danger-ghost btn-sm" data-del>${icon('trash-2')}<span>Hapus</span></button>` : ''}
+              <button type="button" class="btn btn-secondary btn-sm" data-viewas>${icon('eye')}<span>Pratinjau sebagai peran ini</span></button>
               <button type="button" class="btn btn-secondary btn-sm" data-dup>${icon('copy')}<span>Duplikat</span></button>
               <button type="button" class="btn btn-secondary btn-sm" data-edit>${icon('pencil')}<span>Ubah info</span></button></div></div>
           ${locked ? `<div class="alert alert--warning" style="margin:0 20px 16px">${icon('lock')}<div><p class="alert__title">Peran Owner terkunci</p><p class="alert__text">Owner selalu memiliki seluruh izin dan tidak dapat diubah.</p></div></div>` : ''}
@@ -476,6 +477,7 @@
         }
         if (e.target.closest('[data-reset]')) { drawDetail(); syncRowBoxes(); }
         if (e.target.closest('[data-edit]')) openForm(r);
+        if (e.target.closest('[data-viewas]')) { K.viewAs.set(r.id); K.ui.toast('Mode pratinjau peran aktif', r.name + ' — menu & tombol mengikuti izin peran ini.', 'info', 5000); }
         if (e.target.closest('[data-dup]')) { const n = S.insert('roles', { ...r, id: undefined, name: r.name + ' (salinan)', system: false }, { idPrefix: 'role', prepend: false }); selected = n.id; drawList(); drawDetail(); syncRowBoxes(); K.ui.toast('Peran diduplikat'); }
         if (e.target.closest('[data-del]')) {
           const n = S.count('users', u => u.roleId === r.id);

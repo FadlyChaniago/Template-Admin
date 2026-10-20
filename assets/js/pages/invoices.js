@@ -41,7 +41,7 @@
     const sum = st => all().filter(i => st.includes(i.status)).reduce((s, i) => s + totals(i).total, 0);
     view.innerHTML = `${K.ui.pageHead({
       title: 'Invoices', eyebrow: 'Tools', desc: 'Buat, kirim, dan pantau pembayaran invoice pelanggan.',
-      actions: `<a href="#/invoices/new" class="btn btn-primary btn-sm">${icon('plus')}<span>Invoice baru</span></a>`,
+      actions: `<a href="#/invoices/new" class="btn btn-primary btn-sm" data-perm="billing.update">${icon('plus')}<span>Invoice baru</span></a>`,
     })}
       <div class="grid grid-4">
         ${K.ui.kpi({ label: 'Total ditagihkan', value: idr(sum(['paid', 'unpaid', 'overdue']), { compact: true }), icon: 'receipt-text', foot: `${all().filter(i => i.status !== 'draft').length} invoice` })}

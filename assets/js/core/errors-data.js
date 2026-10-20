@@ -27,22 +27,24 @@ window.K = window.K || {};
     const e = K.errorsData[code] || K.errorsData[404];
     const c = K.errorsData[code] ? code : 404;
     const ic = name => icon ? icon(name) : `<i data-lucide="${name}"></i>`;
+    // Terjemahan opsional (K.i18n): kunci err.<kode>.title/text/hint/action, fallback ke data ID
+    const tr = (k, d) => { if (!K.t) return d; const v = K.t(k); return v === k ? d : v; };
     const home = inApp ? '#/dashboard' : 'index.html#/dashboard';
-    const kind = c >= 500 ? 'Kesalahan server' : 'Kesalahan klien';
+    const kind = c >= 500 ? tr('err.server', 'Kesalahan server') : tr('err.client', 'Kesalahan klien');
     const reqId = 'req_' + Math.random().toString(36).slice(2, 10);
     return `<div class="errpage errpage--${e.tone}">
       <div class="errpage__visual" aria-hidden="true"><span class="errpage__code">${c}</span><span class="errpage__icon">${ic(e.icon)}</span></div>
       <p class="eyebrow">${kind} · HTTP ${c}</p>
-      <h1 ${inApp ? 'id="page-title" tabindex="-1"' : ''} class="errpage__title">${e.title}</h1>
-      <p class="errpage__text">${e.text}</p>
-      <p class="errpage__hint">${ic('lightbulb')}<span>${e.hint}</span></p>
+      <h1 ${inApp ? 'id="page-title" tabindex="-1"' : ''} class="errpage__title">${tr(`err.${c}.title`, e.title)}</h1>
+      <p class="errpage__text">${tr(`err.${c}.text`, e.text)}</p>
+      <p class="errpage__hint">${ic('lightbulb')}<span>${tr(`err.${c}.hint`, e.hint)}</span></p>
       <div class="errpage__actions">
-        ${e.action ? `<a href="${e.action.href}" class="btn btn-primary">${ic(e.action.icon)}<span>${e.action.label}</span></a>` : ''}
-        <a href="${home}" class="btn ${e.action ? 'btn-secondary' : 'btn-primary'}">${ic('house')}<span>Ke Dashboard</span></a>
-        <button type="button" class="btn btn-secondary" data-err-back>${ic('undo-2')}<span>Kembali</span></button>
-        ${c >= 500 || c === 408 || c === 429 ? `<button type="button" class="btn btn-ghost" data-err-reload>${ic('refresh-cw')}<span>Coba lagi</span></button>` : ''}
+        ${e.action ? `<a href="${e.action.href}" class="btn btn-primary">${ic(e.action.icon)}<span>${tr(`err.${c}.action`, e.action.label)}</span></a>` : ''}
+        <a href="${home}" class="btn ${e.action ? 'btn-secondary' : 'btn-primary'}">${ic('house')}<span>${tr('err.home', 'Ke Dashboard')}</span></a>
+        <button type="button" class="btn btn-secondary" data-err-back>${ic('undo-2')}<span>${tr('err.back', 'Kembali')}</span></button>
+        ${c >= 500 || c === 408 || c === 429 ? `<button type="button" class="btn btn-ghost" data-err-reload>${ic('refresh-cw')}<span>${tr('err.retry', 'Coba lagi')}</span></button>` : ''}
       </div>
-      <p class="errpage__meta">ID permintaan: <code>${reqId}</code> — sertakan saat menghubungi dukungan.</p>
+      <p class="errpage__meta">${tr('err.req', 'ID permintaan: {id} — sertakan saat menghubungi dukungan.').replace('{id}', `<code>${reqId}</code>`)}</p>
     </div>`;
   };
 

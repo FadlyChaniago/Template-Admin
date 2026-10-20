@@ -91,7 +91,9 @@
         if (a === 'register' && form.email.value.toLowerCase() === 'fadly@kontrol.id') { K.validate.setErrors(form, { email: 'Email sudah terdaftar. Coba masuk.' }); return; }
         const success = $('[data-success]');
         if (success) { form.hidden = true; success.hidden = false; const em = $('[data-email-out]'); if (em && form.email) em.textContent = form.email.value; success.querySelector('a, button')?.focus(); return; }
-        location.href = form.dataset.next || 'index.html';
+        // ?next=#/halaman → kembali ke halaman semula (login & lock screen); hanya hash internal yang diizinkan
+        const next = new URLSearchParams(location.search).get('next');
+        location.href = next && /^#\/[\w\-/?=&]*$/.test(next) ? 'index.html' + next : (form.dataset.next || 'index.html');
       }, 700);
     });
   });

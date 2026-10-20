@@ -28,7 +28,7 @@
 .brand-mark {
   width: 33px; height: 33px; flex-shrink: 0;
   display: grid; place-items: center;
-  border-radius: 9px; background: var(--primary); color: #fff;
+  border-radius: 9px; background: var(--primary-solid); color: #fff;
 }
 .brand-mark svg { width: 20px; height: 20px; }
 .brand-word { font-size: 25px; font-weight: 700; letter-spacing: -1px; white-space: nowrap; }

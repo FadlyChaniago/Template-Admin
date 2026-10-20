@@ -18,6 +18,7 @@
         var d = JSON.parse(localStorage.getItem('kontrol:density') || '"default"');
         document.documentElement.dataset.density = d;
         document.documentElement.dataset.layout = JSON.parse(localStorage.getItem('kontrol:layout') || '"sidebar"');
+        document.documentElement.lang = JSON.parse(localStorage.getItem('kontrol:locale') || '"id"');
       } catch (e) { document.documentElement.dataset.theme = 'light'; }
     })();
   </script>
@@ -29,27 +30,27 @@
   <link rel="stylesheet" href="assets/css/pages.css">
 </head>
 <body>
-  <a class="skip-link" href="#view">Lewati ke konten utama</a>
+  <a class="skip-link" href="#view" data-i18n="shell.skip">Lewati ke konten utama</a>
 
   <div class="app" id="app" data-sidebar="expanded">
 
     <!-- ================= Sidebar (desktop: tetap · mobile: drawer) ================= -->
     <aside class="sidebar" id="sidebar" aria-label="Navigasi utama">
       <div class="sidebar__brand">
-        <a href="#/dashboard" class="flex items-center gap-2" style="gap:10px;color:inherit;text-decoration:none" aria-label="Kontrol — ke Dashboard" data-tip="Dashboard">
+        <a href="#/dashboard" class="flex items-center gap-2" style="gap:10px;color:inherit;text-decoration:none" aria-label="Kontrol — Dashboard" data-tip="Dashboard">
           <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span>
           <span class="brand-word">kontrol<span>.</span></span>
         </a>
-        <button type="button" class="icon-btn sidebar__close" id="drawer-close" aria-label="Tutup menu" data-icon="x"></button>
+        <button type="button" class="icon-btn sidebar__close" id="drawer-close" data-i18n-aria="shell.closeMenu" aria-label="Tutup menu" data-icon="x"></button>
       </div>
 
       <nav class="sidebar__nav" id="sidebar-nav" aria-label="Menu administrasi"></nav>
 
       <div class="sidebar__footer">
         <div class="upgrade-card">
-          <p class="upgrade-card__title">Ruang untuk berkembang</p>
-          <p class="upgrade-card__text">Lebih banyak akses. Lebih banyak kemungkinan.</p>
-          <a href="#/billing" class="btn btn-primary btn-sm"><span>Upgrade Plan</span><span data-icon="arrow-up-right"></span></a>
+          <p class="upgrade-card__title" data-i18n="shell.upgradeTitle">Ruang untuk berkembang</p>
+          <p class="upgrade-card__text" data-i18n="shell.upgradeText">Lebih banyak akses. Lebih banyak kemungkinan.</p>
+          <a href="#/billing" class="btn btn-primary btn-sm"><span data-i18n="shell.upgrade">Upgrade Plan</span><span data-icon="arrow-up-right"></span></a>
         </div>
         <div class="menu-anchor">
           <button type="button" class="account-btn" data-menu-toggle aria-expanded="false" aria-haspopup="menu" data-tip="Profil & akun">
@@ -58,37 +59,38 @@
             <span data-icon="chevrons-up-down"></span>
           </button>
           <div class="menu menu--up" role="menu" style="width:220px">
-            <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span>User Profile</a>
-            <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span>Account Settings</a>
-            <a href="#/billing" class="menu__item" role="menuitem"><span data-icon="sparkles"></span>Upgrade Plan</a>
+            <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span><span data-i18n="shell.profile">User Profile</span></a>
+            <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span><span data-i18n="shell.account">Account Settings</span></a>
+            <a href="#/billing" class="menu__item" role="menuitem"><span data-icon="sparkles"></span><span data-i18n="shell.upgrade">Upgrade Plan</span></a>
             <div class="menu__sep"></div>
-            <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span>Sign Out</button>
+            <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span><span data-i18n="shell.signout">Sign Out</span></button>
           </div>
         </div>
       </div>
     </aside>
     <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true"></div>
-    <div class="nav-tooltip" id="nav-tooltip" role="tooltip"></div>
+    <div class="nav-tooltip" id="nav-tooltip" aria-hidden="true"></div>
 
     <!-- ================= Main ================= -->
     <div class="main-wrap">
       <header class="topbar">
         <div class="topbar__left">
-          <a href="#/dashboard" class="topbar__brand" aria-label="Kontrol — ke Dashboard"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a>
-          <button type="button" class="icon-btn" id="drawer-open" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" data-mobile-only data-icon="menu"></button>
+          <a href="#/dashboard" class="topbar__brand" aria-label="Kontrol — Dashboard"><span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 5v14M10 12l8-7M10 12l8 7"/></svg></span><span class="brand-word">kontrol<span>.</span></span></a>
+          <button type="button" class="icon-btn" id="drawer-open" data-i18n-aria="shell.menu" aria-label="Buka menu" aria-controls="sidebar" aria-expanded="false" data-mobile-only data-icon="menu"></button>
           <button type="button" class="icon-btn" id="sidebar-toggle" aria-controls="sidebar" data-desktop-only></button>
           <nav class="breadcrumb" aria-label="Breadcrumb">
             <span class="breadcrumb__parent" id="crumb-parent">Overview</span>
             <span data-icon="chevron-right"></span>
             <span class="breadcrumb__current" id="crumb-current" aria-current="page">Dashboard</span>
           </nav>
+          <button type="button" class="icon-btn icon-btn--sm pin-toggle" id="pin-toggle" hidden></button>
         </div>
 
         <div class="topbar__right">
-          <button type="button" class="search-trigger" id="search-trigger" aria-label="Cari di workspace (Ctrl+K)">
-            <span data-icon="search" style="display:contents"></span><span>Cari di workspace…</span><kbd>Ctrl K</kbd>
+          <button type="button" class="search-trigger" id="search-trigger" data-i18n-aria="shell.searchAria" aria-label="Cari di workspace (Ctrl+K)">
+            <span data-icon="search" style="display:contents"></span><span data-i18n="shell.search">Cari di workspace…</span><kbd>Ctrl K</kbd>
           </button>
-          <span class="sys-status"><span class="sys-status__dot"></span>Sistem normal</span>
+          <span class="sys-status"><span class="sys-status__dot"></span><span data-i18n="shell.status">Sistem normal</span></span>
           <div class="topbar__divider"></div>
           <button type="button" class="icon-btn" id="theme-toggle" aria-label="Ganti tema"></button>
 
@@ -106,12 +108,12 @@
             </button>
             <div class="menu" role="menu" style="width:230px">
               <div class="menu__header"><p class="fw-600" data-me-name>Fadly Ahmad</p><p class="text-xs text-secondary" data-me-email>fadly@kontrol.id</p></div>
-              <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span>User Profile</a>
-              <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span>Account Settings</a>
-              <a href="#/appearance" class="menu__item" role="menuitem"><span data-icon="palette"></span>Appearance</a>
-              <a href="lock-screen.html" class="menu__item" role="menuitem"><span data-icon="lock"></span>Kunci layar</a>
+              <a href="#/profile" class="menu__item" role="menuitem"><span data-icon="circle-user"></span><span data-i18n="shell.profile">User Profile</span></a>
+              <a href="#/account" class="menu__item" role="menuitem"><span data-icon="user-cog"></span><span data-i18n="shell.account">Account Settings</span></a>
+              <a href="#/appearance" class="menu__item" role="menuitem"><span data-icon="palette"></span><span data-i18n="shell.appearance">Appearance</span></a>
+              <a href="lock-screen.html" class="menu__item" role="menuitem"><span data-icon="lock"></span><span data-i18n="shell.lock">Kunci layar</span></a>
               <div class="menu__sep"></div>
-              <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span>Sign Out</button>
+              <button type="button" class="menu__item menu__item--danger" role="menuitem" data-signout><span data-icon="log-out"></span><span data-i18n="shell.signout">Sign Out</span></button>
             </div>
           </div>
         </div>
@@ -120,17 +122,22 @@
       <!-- Navigasi atas: aktif saat Appearance → Tata letak = "Navigasi atas" -->
       <nav class="topnav" id="topnav" aria-label="Menu utama (atas)"><ul class="topnav__list" id="topnav-list"></ul></nav>
 
+      <!-- Banner global -->
+      <div class="banner banner--warning" id="offline-banner" role="status" hidden><span data-icon="wifi-off"></span><span></span></div>
+      <div class="banner banner--info" id="viewas-banner" role="status" hidden><span data-icon="eye"></span><span></span><button type="button" class="btn btn-secondary btn-sm" id="viewas-exit" data-i18n="shell.viewAsExit">Keluar dari pratinjau</button></div>
+
       <main class="content" id="main">
-        <div class="content-inner" id="view" tabindex="-1" aria-live="polite"></div>
+        <div class="content-inner" id="view" tabindex="-1"></div>
       </main>
 
       <footer class="app-footer">
         <div class="app-footer__inner">
           <p>© 2026 Kontrol <span class="sep">/</span> Admin Workspace</p>
           <div class="flex items-center gap-3 wrap">
-            <span class="flex items-center gap-2"><span style="width:6px;height:6px;border-radius:50%;background:var(--chart-1)"></span>Data ilustratif</span>
-            <span class="text-muted">Bahasa Indonesia · IDR</span>
-            <span class="text-muted">v3.0.0</span>
+            <span class="flex items-center gap-2"><span style="width:6px;height:6px;border-radius:50%;background:var(--chart-1)"></span><span data-i18n="shell.dataNote">Data ilustratif</span></span>
+            <span class="text-muted" data-i18n="shell.footerLang">Bahasa Indonesia · IDR</span>
+            <button type="button" class="text-muted footer-link" onclick="K.openShortcuts()"><kbd>?</kbd></button>
+            <span class="text-muted">v4.0.0</span>
           </div>
         </div>
       </footer>
@@ -139,20 +146,29 @@
 
   <div class="toast-region" id="toast-region" aria-live="polite"></div>
 
-  <!-- Library pihak ketiga via CDN (versi dikunci) -->
-  <script src="https://cdn.jsdelivr.net/npm/lucide@1.59.0/dist/umd/lucide.min.js" defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" defer></script>
+  <!-- Library pihak ketiga — disalin lokal (offline-ready). Lihat assets/vendor/README.md -->
+  <script src="assets/vendor/lucide/lucide.min.js" defer></script>
+  <script src="assets/vendor/chartjs/chart.umd.min.js" defer></script>
+
+  <!-- Konfigurasi (ubah di sini untuk menyambung backend) -->
+  <script src="assets/js/config.js" defer></script>
 
   <!-- Core -->
   <script src="assets/js/core/utils.js" defer></script>
+  <script src="assets/js/core/i18n.js" defer></script>
+  <script src="assets/js/i18n/id.js" defer></script>
+  <script src="assets/js/i18n/en.js" defer></script>
   <script src="assets/js/core/errors-data.js" defer></script>
   <script src="assets/js/core/validate.js" defer></script>
   <script src="assets/js/core/data.js" defer></script>
   <script src="assets/js/core/data-v3.js" defer></script>
+  <script src="assets/js/core/data-v4.js" defer></script>
   <script src="assets/js/core/store.js" defer></script>
   <script src="assets/js/core/ui.js" defer></script>
   <script src="assets/js/core/table.js" defer></script>
   <script src="assets/js/core/charts.js" defer></script>
+  <script src="assets/js/core/api.js" defer></script>
+  <script src="assets/js/core/session.js" defer></script>
   <script src="assets/js/core/app.js" defer></script>
 
   <!-- Modul halaman -->
@@ -168,10 +184,14 @@
   <script src="assets/js/pages/kanban.js" defer></script>
   <script src="assets/js/pages/calendar.js" defer></script>
   <script src="assets/js/pages/inbox.js" defer></script>
+  <script src="assets/js/pages/approvals.js" defer></script>
+  <script src="assets/js/pages/maps.js" defer></script>
   <script src="assets/js/pages/import.js" defer></script>
   <script src="assets/js/pages/invoices.js" defer></script>
   <script src="assets/js/pages/forms.js" defer></script>
   <script src="assets/js/pages/uikit.js" defer></script>
+  <script src="assets/js/pages/uikit-v4.js" defer></script>
+  <script src="assets/js/pages/example.js" defer></script>
   <script src="assets/js/pages/errors.js" defer></script>
 
   <script src="assets/js/main.js" defer></script>

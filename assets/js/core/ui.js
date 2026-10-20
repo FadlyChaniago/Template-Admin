@@ -41,7 +41,8 @@
     },
     badge(status, label) {
       const [tone, def] = ui.statusMap[status] || ['neutral', status];
-      return `<span class="badge badge--${tone}">${esc(label || def)}</span>`;
+      const k = 'status.' + status, tr = K.t ? K.t(k) : k; // terjemahan opsional
+      return `<span class="badge badge--${tone}">${esc(label || (tr !== k ? tr : def))}</span>`;
     },
 
     trend(value, { suffix = '%', invert = false } = {}) {
@@ -71,7 +72,7 @@
       </div>`;
     },
 
-    kpi({ label, value, icon, trend, trendInvert, foot = 'vs bulan lalu', title }) {
+    kpi({ label, value, icon, trend, trendInvert, foot = K.t('common.vsLastMonth'), title }) {
       return `<article class="card kpi">
         <div class="kpi__head"><h2 class="kpi__label">${esc(label)}</h2><span class="kpi__icon">${ui.icon(icon)}</span></div>
         <p class="kpi__value"${title ? ` title="${esc(title)}"` : ''}>${value}</p>
@@ -91,14 +92,14 @@
       return `<button type="button" class="icon-btn icon-btn--sm ${extra}" aria-label="${esc(label)}" title="${esc(label)}" ${attrs}>${ui.icon(icon)}</button>`;
     },
 
-    progress(value, tone = '') {
+    progress(value, tone = '', label = '') {
       const v = Math.max(0, Math.min(100, value));
-      return `<div class="progress ${tone ? 'progress--' + tone : ''}" role="progressbar" aria-valuenow="${Math.round(v)}" aria-valuemin="0" aria-valuemax="100"><span style="width:${v}%"></span></div>`;
+      return `<div class="progress ${tone ? 'progress--' + tone : ''}" role="progressbar" aria-label="${esc(label || Math.round(v) + '%')}" aria-valuenow="${Math.round(v)}" aria-valuemin="0" aria-valuemax="100"><span style="width:${v}%"></span></div>`;
     },
 
-    switchEl({ name, checked, label, id, disabled }) {
+    switchEl({ name, checked, label, id, disabled, ariaLabel }) {
       const _id = id || 'sw_' + name;
-      return `<label class="switch" for="${_id}"><input type="checkbox" id="${_id}" name="${esc(name)}" ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}><span class="switch__track"></span>${label ? `<span>${esc(label)}</span>` : ''}</label>`;
+      return `<label class="switch" for="${_id}"><input type="checkbox" id="${_id}" name="${esc(name)}" ${!label && ariaLabel ? `aria-label="${esc(ariaLabel)}"` : ''} ${checked ? 'checked' : ''} ${disabled ? 'disabled' : ''}><span class="switch__track"></span>${label ? `<span>${esc(label)}</span>` : ''}</label>`;
     },
 
     /* ---------- Form builder ---------- */
@@ -145,7 +146,7 @@
       const el = document.createElement('div');
       el.className = `toast toast--${type}`;
       el.setAttribute('role', type === 'error' ? 'alert' : 'status');
-      el.innerHTML = `${ui.icon(icons[type] || 'info')}<div class="toast__body"><p class="toast__title">${esc(title)}</p>${text ? `<p class="toast__text">${esc(text)}</p>` : ''}${opts.action ? `<button type="button" class="btn btn-secondary btn-sm toast__action" data-act>${esc(opts.action.label)}</button>` : ''}</div>${ui.iconBtn('x', 'Tutup notifikasi', 'data-close')}${timeout ? `<span class="toast__bar" style="animation-duration:${timeout}ms"></span>` : ''}`;
+      el.innerHTML = `${ui.icon(icons[type] || 'info')}<div class="toast__body"><p class="toast__title">${esc(title)}</p>${text ? `<p class="toast__text">${esc(text)}</p>` : ''}${opts.action ? `<button type="button" class="btn btn-secondary btn-sm toast__action" data-act>${esc(opts.action.label)}</button>` : ''}</div>${ui.iconBtn('x', K.t('common.closeToast'), 'data-close')}${timeout ? `<span class="toast__bar" style="animation-duration:${timeout}ms"></span>` : ''}`;
       let timer;
       const close = () => { clearTimeout(timer); el.classList.add('is-leaving'); setTimeout(() => el.remove(), 180); };
       el.querySelector('[data-close]').addEventListener('click', close);
@@ -162,12 +163,12 @@
     /* ---------- Modal (native <dialog>) ----------
        ui.modal({ title, desc, body, size, submitLabel, danger, onSubmit(data, form, close) })
        onSubmit boleh mengembalikan false untuk membatalkan penutupan. */
-    modal({ title, desc = '', body = '', size = '', submitLabel = 'Simpan', cancelLabel = 'Batal', danger = false, onSubmit, onOpen, footer, hideFooter = false }) {
+    modal({ title, desc = '', body = '', size = '', submitLabel = K.t('common.save'), cancelLabel = K.t('common.cancel'), danger = false, onSubmit, onOpen, footer, hideFooter = false }) {
       const dlg = document.createElement('dialog');
       dlg.className = `modal ${size ? 'modal--' + size : ''}`;
       dlg.setAttribute('aria-labelledby', 'modal-title');
       dlg.innerHTML = `<form method="dialog" novalidate style="display:contents">
-        <div class="modal__head"><div><h2 class="modal__title" id="modal-title">${esc(title)}</h2>${desc ? `<p class="modal__desc">${desc}</p>` : ''}</div>${ui.iconBtn('x', 'Tutup', 'data-dismiss value="cancel"')}</div>
+        <div class="modal__head"><div><h2 class="modal__title" id="modal-title">${esc(title)}</h2>${desc ? `<p class="modal__desc">${desc}</p>` : ''}</div>${ui.iconBtn('x', K.t('common.close'), 'data-dismiss value="cancel"')}</div>
         <div class="modal__body">${body}</div>
         ${hideFooter ? '' : `<div class="modal__foot">${footer ?? `<button type="button" class="btn btn-secondary" data-dismiss>${esc(cancelLabel)}</button>${onSubmit ? `<button type="submit" class="btn ${danger ? 'btn-danger' : 'btn-primary'}" value="submit">${esc(submitLabel)}</button>` : ''}`}</div>`}
       </form>`;
@@ -187,7 +188,7 @@
           el.setAttribute('aria-invalid', ok ? 'false' : 'true');
           if (!ok && valid) { el.focus(); valid = false; }
         });
-        if (!valid) { ui.toast('Periksa kembali isian', 'Beberapa kolom wajib belum valid.', 'error'); return; }
+        if (!valid) { ui.toast(K.t('common.checkFields'), K.t('common.checkFieldsText'), 'error'); return; }
         const result = onSubmit(K.util.formData(form), form, close);
         if (result !== false) close();
       });
@@ -198,7 +199,10 @@
       return { dialog: dlg, form, close };
     },
 
-    confirm({ title = 'Anda yakin?', text = '', confirmLabel = 'Hapus', danger = true }) {
+    /** Drawer samping kanan (edit cepat tanpa pindah halaman). Opsi sama dengan modal. */
+    drawer(opts) { return ui.modal({ ...opts, size: 'drawer' }); },
+
+    confirm({ title = K.t ? K.t('common.confirm') : 'Anda yakin?', text = '', confirmLabel = K.t ? K.t('common.delete') : 'Hapus', danger = true } = {}) {
       return new Promise(resolve => {
         let ok = false;
         const m = ui.modal({

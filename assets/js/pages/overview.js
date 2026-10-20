@@ -36,34 +36,34 @@
 
       view.innerHTML = `
         ${K.ui.pageHead({
-          title: 'Dashboard', eyebrow: 'Overview',
-          desc: `Selamat datang kembali, ${esc(me.name.split(' ')[0])}. Berikut ringkasan workspace Anda.`,
-          actions: `<label class="input-icon">${icon('calendar')}<select class="select select-sm" style="padding-left:34px;width:auto" id="dash-period" aria-label="Periode laporan">
+          title: K.navLabel('dashboard'), eyebrow: 'Overview',
+          desc: esc(K.t('dash.desc', { name: me.name.split(' ')[0] })),
+          actions: `<label class="input-icon">${icon('calendar')}<select class="select select-sm" style="padding-left:34px;width:auto" id="dash-period" aria-label="${esc(K.t('dash.period'))}">
               ${Object.entries(PERIODS).map(([k, p]) => `<option value="${k}">${p.label}</option>`).join('')}</select></label>
-            <button type="button" class="btn btn-primary btn-sm" id="dash-export">${icon('download')}<span>Ekspor laporan</span></button>`,
+            <button type="button" class="btn btn-primary btn-sm" id="dash-export">${icon('download')}<span>${esc(K.t('dash.export'))}</span></button>`,
         })}
         <div class="grid grid-4" id="dash-kpis"></div>
 
         <div class="grid grid-main-side mt-4">
           <article class="card" id="analytics-card">
             <div class="card__head">
-              <div><h2 class="card__title">Ringkasan pendapatan</h2><p class="card__desc">Perbandingan kinerja dengan periode sebelumnya</p></div>
+              <div><h2 class="card__title">${esc(K.t('dash.revenue'))}</h2><p class="card__desc">${esc(K.t('dash.revenueDesc'))}</p></div>
               <div class="segmented" role="group" aria-label="Interval grafik">
-                <button type="button" data-interval="daily" aria-pressed="true">Harian</button>
-                <button type="button" data-interval="weekly" aria-pressed="false">Mingguan</button>
+                <button type="button" data-interval="daily" aria-pressed="true">${esc(K.t('dash.daily'))}</button>
+                <button type="button" data-interval="weekly" aria-pressed="false">${esc(K.t('dash.weekly'))}</button>
               </div>
             </div>
             <div class="flex wrap items-center justify-between gap-3 mt-5">
               <div class="flex items-center gap-3 wrap"><p class="tabular" style="font-size:25px;font-weight:600;letter-spacing:-0.8px;line-height:1" id="rev-total"></p><span id="rev-trend"></span></div>
-              <div class="legend"><span class="legend__item"><span class="legend__line" style="background:var(--chart-1)"></span>Periode ini</span><span class="legend__item"><span class="legend__line" style="background:var(--chart-2)"></span>Periode lalu</span></div>
+              <div class="legend"><span class="legend__item"><span class="legend__line" style="background:var(--chart-1)"></span>${esc(K.t('dash.thisPeriod'))}</span><span class="legend__item"><span class="legend__line" style="background:var(--chart-2)"></span>${esc(K.t('dash.lastPeriod'))}</span></div>
             </div>
             <div class="chart-box mt-5" style="height:240px"><canvas id="rev-chart" role="img" aria-label="Grafik pendapatan periode ini dibanding periode lalu"></canvas></div>
           </article>
 
           <article class="card" style="display:flex;flex-direction:column">
             <div class="card__head">
-              <div><h2 class="card__title">Produk teratas</h2><p class="card__desc">Berdasarkan pendapatan periode ini</p></div>
-              <span class="count-pill">4 produk</span>
+              <div><h2 class="card__title">${esc(K.t('dash.products'))}</h2><p class="card__desc">${esc(K.t('dash.productsDesc'))}</p></div>
+              <span class="count-pill">${esc(K.t('dash.nProducts', { n: 4 }))}</span>
             </div>
             <div class="card__body stack" id="top-products" style="gap:18px;flex:1"></div>
           </article>
@@ -73,14 +73,14 @@
           <section id="dash-tx" aria-label="Transaksi terbaru"></section>
           <div class="stack">
             <article class="card">
-              <div class="card__head"><div><h2 class="card__title">Metode pembayaran</h2><p class="card__desc">Distribusi transaksi berhasil</p></div></div>
+              <div class="card__head"><div><h2 class="card__title">${esc(K.t('dash.payments'))}</h2><p class="card__desc">${esc(K.t('dash.paymentsDesc'))}</p></div></div>
               <div class="flex items-center gap-4 mt-5 wrap">
                 <div class="chart-box" style="width:140px;height:140px;flex-shrink:0"><canvas id="pay-chart" role="img" aria-label="Distribusi metode pembayaran"></canvas></div>
                 <div class="stack flex-1" style="gap:10px;min-width:140px" id="pay-legend"></div>
               </div>
             </article>
             <article class="card">
-              <div class="card__head"><div><h2 class="card__title">Aktivitas tim</h2><p class="card__desc">Pembaruan terbaru di workspace</p></div><a href="#/activity" class="btn btn-ghost btn-sm">Semua</a></div>
+              <div class="card__head"><div><h2 class="card__title">${esc(K.t('dash.activity'))}</h2><p class="card__desc">${esc(K.t('dash.activityDesc'))}</p></div><a href="#/activity" class="btn btn-ghost btn-sm">${esc(K.t('common.seeAll'))}</a></div>
               <div class="card__body timeline" id="dash-activity"></div>
             </article>
           </div>
@@ -91,10 +91,10 @@
       function renderKPIs() {
         const p = PERIODS[periodKey];
         $('#dash-kpis').innerHTML = [
-          K.ui.kpi({ label: 'Total pendapatan', value: idr(p.revenue, { compact: true }), title: idr(p.revenue), icon: 'wallet', trend: p.trend[0] }),
-          K.ui.kpi({ label: 'Total transaksi', value: num(p.tx), icon: 'receipt', trend: p.trend[1] }),
-          K.ui.kpi({ label: 'Pengguna aktif', value: num(p.users), icon: 'users', trend: p.trend[2] }),
-          K.ui.kpi({ label: 'Tingkat konversi', value: `${num(p.conv, 2)}<small>%</small>`, icon: 'percent', trend: p.trend[3] }),
+          K.ui.kpi({ label: K.t('dash.kpi.revenue'), foot: K.t('common.vsLastMonth'), value: idr(p.revenue, { compact: true }), title: idr(p.revenue), icon: 'wallet', trend: p.trend[0] }),
+          K.ui.kpi({ label: K.t('dash.kpi.tx'), foot: K.t('common.vsLastMonth'), value: num(p.tx), icon: 'receipt', trend: p.trend[1] }),
+          K.ui.kpi({ label: K.t('dash.kpi.users'), foot: K.t('common.vsLastMonth'), value: num(p.users), icon: 'users', trend: p.trend[2] }),
+          K.ui.kpi({ label: K.t('dash.kpi.conv'), foot: K.t('common.vsLastMonth'), value: `${num(p.conv, 2)}<small>%</small>`, icon: 'percent', trend: p.trend[3] }),
         ].join('');
       }
 
@@ -111,7 +111,7 @@
         K.charts.destroyAll(); // grafik di halaman ini dibuat ulang bersama
         K.charts.line($('#rev-chart'), {
           labels,
-          datasets: [{ label: 'Periode ini', data: a }, { label: 'Periode lalu', data: b, dashed: true }],
+          datasets: [{ label: K.t('dash.thisPeriod'), data: a }, { label: K.t('dash.lastPeriod'), data: b, dashed: true }],
           yFormat: v => num(v / 1e6) + ' jt', tooltipFormat: v => idr(v),
         });
         renderPayments();
@@ -128,7 +128,7 @@
             <div class="flex-1">
               <div class="flex wrap items-center justify-between gap-2 text-sm"><p class="fw-500">${esc(p.name)}</p><p class="fw-600 tabular">${idr(p.revenue * scale)}</p></div>
               <div class="mt-2">${K.ui.progress((p.revenue / max) * 83)}</div>
-              <p class="mt-1 text-xs text-secondary flex justify-between"><span>${num(Math.round(p.sold * scale))} terjual</span><span class="tabular">${num((p.revenue / total) * 100, 1)}%</span></p>
+              <p class="mt-1 text-xs text-secondary flex justify-between"><span>${esc(K.t('dash.sold', { n: num(Math.round(p.sold * scale)) }))}</span><span class="tabular">${num((p.revenue / total) * 100, 1)}%</span></p>
             </div>
           </div>`).join('');
       }
@@ -152,18 +152,18 @@
 
       // Tabel transaksi terbaru memakai DataTable reusable
       const tx = new K.DataTable($('#dash-tx'), {
-        title: 'Transaksi terbaru', desc: 'Pantau aktivitas dan status transaksi terbaru Anda.',
-        rows: () => K.store.all('transactions'), pageSize: 6, searchPlaceholder: 'Cari transaksi…',
+        title: K.t('dash.tx'), desc: K.t('dash.txDesc'),
+        rows: () => K.store.all('transactions'), pageSize: 6, searchPlaceholder: K.t('dash.txSearch'),
         search: r => `${r.id} ${r.customer} ${r.email} ${K.lookup.product(r.productId).name}`,
-        tabs: { key: 'status', options: [['success', 'Berhasil'], ['pending', 'Pending'], ['failed', 'Gagal']] },
+        tabs: { key: 'status', options: [['success', K.t('status.success')], ['pending', K.t('status.pending')], ['failed', K.t('status.failed')]] },
         exportName: 'transaksi',
         columns: [
-          { key: 'id', label: 'ID Transaksi', className: 'hide-lg nowrap', render: r => `<span class="text-secondary fw-500">${esc(r.id)}</span>` },
-          { key: 'customer', label: 'Pelanggan', sortable: true, render: r => K.ui.person({ name: r.customer, email: r.email }) },
-          { key: 'productId', label: 'Produk', className: 'hide-md nowrap', render: r => `<span class="text-secondary">${esc(K.lookup.product(r.productId).name)}</span>`, csv: r => K.lookup.product(r.productId).name },
-          { key: 'createdAt', label: 'Tanggal', sortable: true, className: 'hide-lg nowrap', render: r => `<span class="text-secondary">${K.util.date(r.createdAt)}</span><span class="text-xs text-muted" style="display:block">${K.util.time(r.createdAt)}</span>` },
-          { key: 'amount', label: 'Jumlah', sortable: true, className: 'num nowrap fw-500', render: r => idr(r.amount) },
-          { key: 'status', label: 'Status', render: r => K.ui.badge(r.status) },
+          { key: 'id', label: K.t('dash.col.id'), className: 'hide-lg nowrap', render: r => `<span class="text-secondary fw-500">${esc(r.id)}</span>` },
+          { key: 'customer', label: K.t('dash.col.customer'), sortable: true, render: r => K.ui.person({ name: r.customer, email: r.email }) },
+          { key: 'productId', label: K.t('dash.col.product'), className: 'hide-md nowrap', render: r => `<span class="text-secondary">${esc(K.lookup.product(r.productId).name)}</span>`, csv: r => K.lookup.product(r.productId).name },
+          { key: 'createdAt', label: K.t('dash.col.date'), sortable: true, className: 'hide-lg nowrap', render: r => `<span class="text-secondary">${K.util.date(r.createdAt)}</span><span class="text-xs text-muted" style="display:block">${K.util.time(r.createdAt)}</span>` },
+          { key: 'amount', label: K.t('dash.col.amount'), sortable: true, className: 'num nowrap fw-500', render: r => idr(r.amount) },
+          { key: 'status', label: K.t('dash.col.status'), render: r => K.ui.badge(r.status) },
         ],
         rowActions: () => K.ui.iconBtn('eye', 'Lihat detail', 'data-action="view"'),
         onAction: (a, r) => a === 'view' && showTx(r),
@@ -196,7 +196,7 @@
         const p = PERIODS[periodKey];
         const rows = [['Metrik', 'Nilai'], ['Periode', p.label], ['Total pendapatan', p.revenue], ['Total transaksi', p.tx], ['Pengguna aktif', p.users], ['Tingkat konversi (%)', p.conv]];
         K.util.downloadFile(`ringkasan-dashboard-${periodKey}.csv`, '﻿' + rows.map(r => r.join(',')).join('\n'), 'text/csv');
-        K.ui.toast('Laporan diekspor', 'Ringkasan ' + p.label + ' telah diunduh.');
+        K.ui.toast(K.t('dash.exported'), 'Ringkasan ' + p.label + ' telah diunduh.');
       });
 
       renderKPIs(); renderProducts(); renderChart(); renderActivity();

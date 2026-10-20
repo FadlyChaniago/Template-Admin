@@ -54,11 +54,11 @@
       function drawMonth() {
         const evs = events(), byDay = {};
         evs.forEach(e => { (byDay[key(e.d)] = byDay[key(e.d)] || []).push(e); });
-        $('#cal-body').innerHTML = `<div class="cal-grid" role="grid" aria-label="Kalender bulan">
-          ${DAYS.map(d => `<div class="cal-dow" role="columnheader">${d}</div>`).join('')}
+        $('#cal-body').innerHTML = `<div class="cal-grid" role="group" aria-label="Kalender bulan">
+          ${DAYS.map(d => `<div class="cal-dow" aria-hidden="true">${d}</div>`).join('')}
           ${monthGrid(cursor).map(d => {
             const list = byDay[key(d)] || [], out = d.getMonth() !== cursor.getMonth();
-            return `<div class="cal-cell ${out ? 'is-out' : ''} ${sameDay(d, today) ? 'is-today' : ''} ${d.getDay() === 0 || d.getDay() === 6 ? 'is-weekend' : ''}" role="gridcell" data-day="${key(d)}">
+            return `<div class="cal-cell ${out ? 'is-out' : ''} ${sameDay(d, today) ? 'is-today' : ''} ${d.getDay() === 0 || d.getDay() === 6 ? 'is-weekend' : ''}" data-day="${key(d)}">
               <button type="button" class="cal-cell__num" data-add="${key(d)}" aria-label="Tambah acara ${d.getDate()} ${d.toLocaleDateString('id-ID', { month: 'long' })}">${d.getDate()}</button>
               <div class="cal-cell__evs">${list.slice(0, 3).map(evChip).join('')}${list.length > 3 ? `<button type="button" class="cal-more" data-more="${key(d)}">+${list.length - 3} lagi</button>` : ''}</div>
             </div>`;

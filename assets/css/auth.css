@@ -4,7 +4,7 @@
 body { background: var(--bg-panel); }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text-strong); margin-bottom: 40px; }
 .brand:hover { text-decoration: none; }
-.brand-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--primary); color: #fff; }
+.brand-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--primary-solid); color: #fff; }
 .brand-mark svg { width: 22px; height: 22px; }
 .brand-word { font-size: 26px; font-weight: 700; letter-spacing: -1px; }
 .brand-word span { color: var(--primary); }

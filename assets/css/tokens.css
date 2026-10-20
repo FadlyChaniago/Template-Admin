@@ -17,8 +17,8 @@
 
   /* Text */
   --text-strong: #0F172A;
-  --text-secondary: #64748B;
-  --text-muted: #94A3B8;
+  --text-secondary: #526075;
+  --text-muted: #64748B;
 
   /* Lines */
   --border: #E2E8F0;
@@ -29,6 +29,8 @@
   --primary-hover: #1D4ED8;
   --primary-active: #1E40AF;
   --primary-contrast: #FFFFFF;
+  --primary-solid: #2563EB;        /* latar tombol utama, kontras teks putih ≥ 4.5:1 */
+  --primary-solid-hover: #1D4ED8;
   --primary-soft: #EFF6FF;
   --primary-soft-hover: #DBEAFE;
   --nav-active-bg: #EFF6FF;
@@ -48,13 +50,13 @@
   --chart-c6: #06B6D4;
 
   /* Status */
-  --success: #059669;
+  --success: #047857;
   --success-bg: #ECFDF5;
-  --warning: #D97706;
+  --warning: #B45309;
   --warning-bg: #FFFBEB;
-  --danger: #DC2626;
+  --danger: #C81E1E;
   --danger-bg: #FEF2F2;
-  --danger-hover: #B91C1C;
+  --danger-hover: #A11717;
   --info: #2563EB;
   --info-bg: #EFF6FF;
   --neutral-bg: #F1F5F9;
@@ -113,7 +115,7 @@
 
   --text-strong: #F1F5F9;
   --text-secondary: #94A3B8;
-  --text-muted: #64748B;
+  --text-muted: #8391A7;
 
   --border: #273449;
   --border-strong: #334155;
@@ -122,6 +124,8 @@
   --primary-hover: #60A5FA;
   --primary-active: #2563EB;
   --primary-contrast: #FFFFFF;
+  --primary-solid: #2563EB;        /* latar tombol utama, kontras teks putih ≥ 4.5:1 */
+  --primary-solid-hover: #1D4ED8;
   --primary-soft: #172B4D;
   --primary-soft-hover: #1E3A5F;
   --nav-active-bg: #172B4D;

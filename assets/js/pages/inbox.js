@@ -40,7 +40,7 @@
         $('#ib-convs').innerHTML = list.map(c => {
           const last = c.messages[c.messages.length - 1];
           const [chName, chIcon, chTone] = CH[c.channel];
-          return `<li><button type="button" class="conv ${c.id === active ? 'is-active' : ''} ${c.unread ? 'is-unread' : ''}" data-conv="${c.id}" role="option" aria-selected="${c.id === active}">
+          return `<li role="none"><button type="button" class="conv ${c.id === active ? 'is-active' : ''} ${c.unread ? 'is-unread' : ''}" data-conv="${c.id}" role="option" aria-selected="${c.id === active}">
             <span class="conv__avatar">${K.ui.avatar(c.name)}<span class="conv__ch" data-c="${chTone}" title="${chName}">${icon(chIcon)}</span></span>
             <span class="flex-1" style="min-width:0"><span class="flex justify-between gap-2"><span class="conv__name truncate">${esc(c.name)}</span><span class="conv__time">${K.util.ago(c.updatedAt).replace(' lalu', '')}</span></span>
             <span class="flex justify-between gap-2 mt-1"><span class="conv__preview truncate">${last.dir === 'out' ? 'Anda: ' : ''}${esc(last.text)}</span>${c.unread ? `<span class="conv__badge">${c.unread}</span>` : c.starred ? icon('star', 'star-on') : ''}</span></span>

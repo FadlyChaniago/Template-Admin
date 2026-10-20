@@ -1,9 +1,11 @@
 # Kontrol — Enterprise Admin Dashboard
 
 Template admin dashboard lengkap berbasis **HTML + CSS + JavaScript murni** (tanpa framework, tanpa build step).
-Semua 27 modul di sidebar sudah berfungsi dengan data demo, mode **terang & gelap**, responsif dari 360px hingga desktop lebar.
+Semua modul di sidebar sudah berfungsi dengan data demo, mode **terang & gelap**, Bahasa **Indonesia/English**, responsif dari 360px hingga desktop lebar, dan siap disambung ke backend (Laravel/FastAPI/Node) cukup lewat `config.js`.
 
-![Status](https://img.shields.io/badge/stack-HTML%20%7C%20CSS%20%7C%20Vanilla%20JS-2563EB) ![Build](https://img.shields.io/badge/build-tidak%20perlu-059669)
+📚 **Dokumentasi lengkap: [`docs/`](docs/README.md)** · 📝 [CHANGELOG](CHANGELOG.md)
+
+![Status](https://img.shields.io/badge/stack-HTML%20%7C%20CSS%20%7C%20Vanilla%20JS-2563EB) ![Build](https://img.shields.io/badge/build-tidak%20perlu-059669) ![Version](https://img.shields.io/badge/versi-4.0.0-2563EB) ![a11y](https://img.shields.io/badge/axe%20WCAG%20AA-0%20pelanggaran-047857)
 
 ---
 
@@ -12,10 +14,11 @@ Semua 27 modul di sidebar sudah berfungsi dengan data demo, mode **terang & gela
 | Aspek | Pilihan | Alasan |
 |---|---|---|
 | Framework | Tidak ada (vanilla JS) | Bisa dibuka langsung, mudah dipindah ke Laravel Blade / backend apa pun |
-| Ikon | [Lucide](https://lucide.dev) `1.59.0` via CDN | Konsisten dengan desain (stroke 1.8), ringan |
-| Grafik | [Chart.js](https://www.chartjs.org) `4.5.1` via CDN | Matang, aksesibel, mudah di-theme |
+| Ikon | [Lucide](https://lucide.dev) `1.59.0` (lokal, `assets/vendor`) | Konsisten dengan desain (stroke 1.8), ringan |
+| Grafik | [Chart.js](https://www.chartjs.org) `4.5.1` (lokal) | Matang, aksesibel, mudah di-theme |
 | Routing | Hash router (`#/users`) | Jalan di GitHub Pages & `file://` tanpa konfigurasi server |
-| Data | `localStorage` + data seed | Demo CRUD terasa nyata; diganti `fetch()` saat integrasi |
+| Peta | [Leaflet](https://leafletjs.com) `1.9.4` + MarkerCluster (lokal, dimuat saat dibuka) | Ringan, tile bisa diganti server internal |
+| Data | `K.api` → mode `demo` (seed + localStorage) atau `api` (REST) | Ganti satu baris di `config.js`, halaman tidak berubah |
 | Tema | CSS custom properties + `data-theme` | Satu sumber token warna untuk light/dark |
 
 ## Menjalankan
@@ -33,11 +36,13 @@ Halaman login demo: `login.html` (kata sandi apa pun ≥ 8 karakter).
 
 ## Deploy ke GitHub Pages
 
-1. Push repo ke GitHub.
-2. **Settings → Pages → Source: Deploy from a branch → `main` / root**.
+Workflow sudah tersedia di `.github/workflows/pages.yml`.
+
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Push ke `main` (atau jalankan manual dari tab **Actions**).
 3. Akses di `https://<username>.github.io/<repo>/`.
 
-Tidak perlu build — semua path relatif.
+Tidak perlu build — workflow hanya mengecek sintaks JS lalu menyalin file statis.
 
 ## Struktur proyek
 
@@ -47,7 +52,10 @@ kontrol-admin/
 ├── login.html, register.html, forgot-password.html, reset-password.html,
 │   verify-email.html, two-factor.html, lock-screen.html   # Auth standalone
 ├── error.html, 404.html    # Halaman error standalone
+├── docs/                   # Dokumentasi teknis (lihat docs/README.md)
+├── .github/workflows/pages.yml   # Deploy GitHub Pages
 ├── assets/
+│   ├── vendor/             # Lucide, Chart.js, Leaflet, MarkerCluster (+ lisensi)
 │   ├── css/
 │   │   ├── tokens.css      # Design tokens light/dark (warna, font, radius)
 │   │   ├── base.css        # Reset, tipografi, utilitas, focus ring
@@ -56,16 +64,22 @@ kontrol-admin/
 │   │   └── pages.css       # Gaya khusus per modul
 │   ├── img/favicon.svg
 │   └── js/
+│       ├── config.js       # ⚙️ Konfigurasi: dataMode demo/api, auth, sesi, peta
+│       ├── i18n/           # Kamus id.js & en.js
 │       ├── core/
 │       │   ├── utils.js    # Format IDR/tanggal, escape HTML, CSV, PRNG
 │       │   ├── validate.js # Validasi form berbasis atribut HTML
 │       │   ├── errors-data.js # Data & renderer halaman error 4xx/5xx
 │       │   ├── data.js     # Data seed demo
 │       │   ├── data-v3.js  # Seed Kanban, Calendar, Inbox, Invoices, Import
+│       │   ├── data-v4.js  # Seed Approvals, lokasi peta, proyek (starter CRUD)
 │       │   ├── store.js    # Repository in-memory + localStorage
 │       │   ├── ui.js       # Icon, toast, modal, confirm, form builder, menu
 │       │   ├── table.js    # DataTable: cari, filter, sort, paginasi, bulk, CSV
 │       │   ├── charts.js   # Wrapper Chart.js yang mengikuti tema
+│       │   ├── i18n.js     # K.t() & atribut data-i18n
+│       │   ├── api.js      # K.api: adapter demo/HTTP, retry, error terpusat
+│       │   ├── session.js  # Kunci layar saat idle
 │       │   └── app.js      # Navigasi, router, tema, sidebar, command palette
 │       ├── pages/          # Satu file per grup sidebar
 │       │   ├── overview.js       # Dashboard
@@ -78,14 +92,17 @@ kontrol-admin/
 │       │   ├── support.js        # Help Center, Documentation, Feedback
 │       │   ├── account.js        # Profile, Account Settings, Upgrade Plan
 │       │   ├── kanban.js / calendar.js / inbox.js / import.js / invoices.js  # Tools (v3)
+│       │   ├── approvals.js / maps.js   # Tools (v4)
+│       │   ├── uikit-v4.js       # UI Kit: Overlays, States, Timeline
+│       │   ├── example.js        # ⭐ Starter CRUD — salin untuk modul baru
 │       │   ├── forms.js          # UI Kit: Forms & Wizard, Auth Pages
 │       │   ├── uikit.js          # UI Kit: Toasts, Icons, Charts, Tables, Errors
 │       │   └── errors.js         # 404, 403, #/error/:kode
-│       └── auth.js         # Perilaku halaman auth standalone
+│       ├── auth.js         # Perilaku halaman auth standalone
 │       └── main.js         # Entry point
 ```
 
-**Kenapa dipisah per lapisan?** `core/` tidak tahu apa pun tentang modul bisnis, sedangkan `pages/` hanya memakai API core. Saat Anda mengganti data demo dengan backend, cukup ubah `store.js` — halaman tidak perlu disentuh.
+**Kenapa dipisah per lapisan?** `core/` tidak tahu apa pun tentang modul bisnis, sedangkan `pages/` hanya memakai API core. Halaman baru membaca data lewat `K.api`, jadi beralih dari data demo ke backend cukup mengubah `dataMode` di `config.js`.
 
 ## Daftar modul
 
@@ -119,6 +136,21 @@ kontrol-admin/
 | | Documentation | Referensi API, scrollspy, salin kode, unduh OpenAPI |
 | | Feedback | Formulir + rating, papan voting |
 | Akun | Profile / Account / Upgrade Plan | Profil, ganti email/sandi + meter kekuatan, setup 2FA + kode cadangan, paket & invoice |
+
+## Baru di v4 (final)
+
+| Area | Isi | Dokumen |
+|---|---|---|
+| **Fondasi backend** | `config.js` (demo ↔ api), `K.api` (retry, timeout, 401/403/422/5xx), Starter CRUD `#/example` | [api](docs/api.md) · [crud-pattern](docs/crud-pattern.md) |
+| **Approvals** `#/approvals` | Persetujuan berjenjang berdasarkan tipe & nominal, setujui/tolak + komentar, diskusi, riwayat | – |
+| **Maps** `#/maps` | Sebaran ATM/CRM/cabang, cluster, filter status, mode gelap | [getting-started](docs/getting-started.md) (tile internal) |
+| **UI Kit** | Modal & Drawer (6 varian), Empty/Loading/Offline states, Timeline & Stepper | [components](docs/components.md) |
+| **Izin** | `data-perm` deklaratif + pratinjau peran ("lihat sebagai") | [permissions](docs/permissions.md) |
+| **Shell** | Favorit, halaman terakhir, pencarian data di Ctrl+K, modal pintasan `?`, banner offline | – |
+| **i18n** | Indonesia / English | [i18n](docs/i18n.md) |
+| **Sesi** | Peringatan + lock screen otomatis saat idle | [session](docs/session.md) |
+| **Offline** | Semua library lokal di `assets/vendor/` | – |
+| **Kualitas** | axe-core WCAG 2 A/AA: 0 pelanggaran (17 rute × 2 tema) | [accessibility](docs/accessibility.md) |
 
 ## Baru di v3 — grup **Tools**
 
@@ -168,7 +200,8 @@ Contoh lengkap: `userDetail()` dan `userEdit()` di `assets/js/pages/management.j
 
 ## Fitur global
 
-- **Command palette** — `Ctrl/⌘ + K` atau `/` untuk lompat ke halaman/aksi.
+- **Command palette** — `Ctrl/⌘ + K` atau `/`: halaman, aksi, halaman terakhir, dan pencarian data.
+- **Pintasan** — tekan `?` untuk daftar lengkap (`g d` Dashboard, `g u` Users, `[` sidebar, `t` tema, `f` favorit).
 - **Sidebar** — ciut/buka (tersimpan), grup bisa dilipat, tooltip saat ciut, drawer di mobile (Esc/klik backdrop menutup).
 - **Aksesibilitas** — skip link, `aria-*` pada tab/menu/modal, focus ring, `<dialog>` native, target sentuh ≥ 44px di mobile, menghormati `prefers-reduced-motion`.
 - **Tabel responsif** — kolom sekunder disembunyikan berdasarkan **lebar kartu** (container query), hanya area tabel yang scroll horizontal.
@@ -197,21 +230,20 @@ Contoh lengkap: `userDetail()` dan `userEdit()` di `assets/js/pages/management.j
 
 ## Integrasi ke backend (Laravel / FastAPI / Node)
 
-`K.store` sengaja dibuat mirip repository. Ganti implementasinya dengan `fetch()`:
-
 ```js
-async all(name) {
-  const res = await fetch(`/api/${name}`, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
-  if (!res.ok) throw new Error(res.status);
-  return (await res.json()).data;
-}
+// assets/js/config.js
+dataMode: 'api',
+apiBaseUrl: '/api/v1',
+authMode: 'cookie',   // Laravel Sanctum SPA + CSRF
 ```
 
+Backend cukup menyediakan REST bergaya Laravel API Resource (`{ data, meta }`, error `422 { errors }`). Detail kontrak: [docs/api.md](docs/api.md).
+
 Catatan penting:
-- **Visibilitas menu ≠ otorisasi.** `K.can()` hanya menyaring UI. Setiap route & endpoint wajib memeriksa izin di server (mis. Laravel Policy/Gate, FastAPI dependency).
+- **Visibilitas menu ≠ otorisasi.** `K.can()` dan `data-perm` hanya menyaring UI. Setiap route & endpoint wajib memeriksa izin di server (Laravel Policy/Gate, FastAPI dependency).
 - Simpan sesi di **cookie HttpOnly**, bukan `localStorage`.
-- Semua data dinamis sudah di-escape lewat `K.util.esc()`; pertahankan pola ini untuk mencegah XSS.
-- Untuk tabel besar, pindahkan cari/filter/sort/paginasi ke server (cursor pagination).
+- Semua data dinamis di-escape lewat `K.util.esc()`; pertahankan pola ini untuk mencegah XSS.
+- Modul lama (v1–v3) masih membaca `K.store` langsung untuk demo; saat integrasi, pindahkan bertahap ke `K.api` mengikuti `pages/example.js`.
 
 ## Kustomisasi tema
 
@@ -224,7 +256,7 @@ Semua warna ada di `assets/css/tokens.css`. Contoh mengganti warna utama:
 
 ## Mode offline
 
-Lucide dan Chart.js dimuat dari CDN jsDelivr dengan versi dikunci. Untuk lingkungan tanpa internet, unduh kedua file lalu ubah `src` di `index.html` ke `assets/vendor/…`. Aplikasi tetap berjalan bila CDN gagal — ikon/grafik saja yang tidak tampil.
+Semua library ada di `assets/vendor/` dengan versi & lisensi tercatat di `assets/vendor/README.md` — aplikasi berjalan tanpa internet. Satu-satunya sumber eksternal adalah tile peta OpenStreetMap; untuk jaringan tertutup ganti `map.tileUrl` di `config.js` ke tile server internal.
 
 ## Lisensi
 
